@@ -4,7 +4,7 @@ version_file = os.path.join(os.path.dirname(__file__), 'version.py')
 if os.path.isfile(version_file):
     from .version import __version__ as version
 else:
-    version = 'dev' #!
+    version = '0.0.1dev0' #!
 
 name = 'dicountries'
 copyright = '2020, SoftwareONE'
