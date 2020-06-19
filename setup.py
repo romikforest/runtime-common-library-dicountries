@@ -47,4 +47,7 @@ setup(name=metadata.name,
       install_requires=reqs('requirements.txt'),
       extras_require=extras_require(),
       long_description=open('README.md').read(),
+      package_data={
+          "dicountries": ["data/*"],
+      }
       zip_safe=False)
