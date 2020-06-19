@@ -18,7 +18,7 @@ def _pip_requirement(req, *root):
 
 
 def _reqs(*f):
-    path = (Path.cwd()).joinpath(*f)
+    path = (Path.cwd() / 'requirements').joinpath(*f)
     with path.open() as fh:
         reqs = [strip_comments(l) for l in fh.readlines()]
         return [_pip_requirement(r, *f[:-1]) for r in reqs if r]
@@ -44,7 +44,7 @@ setup(name=metadata.name,
       description=metadata.description,
       packages=find_packages(exclude=['tests', 'examples', 'docs']),
       python_requires='>=3.6.0',
-      install_requires=reqs('requirements.txt'),
+      install_requires=reqs('default.txt'),
       extras_require=extras_require(),
       long_description=open('README.md').read(),
       package_data={
