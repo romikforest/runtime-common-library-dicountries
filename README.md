@@ -85,6 +85,9 @@ but if there is a comma \[,\] in the returned name it will recombine the name so
 the part after the comma will precede the part before the comma. The comma will be
 deleted.
 
+You can also do this transformation on any string using function `reorder_name(name)`
+from the `dicountries.utils` module.
+
 Every time you run this script it will create a subdirectory `indexes` in
 the currebt working directory to backup indexes there. You can pass the index
 directory explicitly to the `CountryIndex` constructor like this:
