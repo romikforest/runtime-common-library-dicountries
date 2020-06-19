@@ -44,7 +44,7 @@ setup(name=metadata.name,
       description=metadata.description,
       packages=find_packages(exclude=['tests', 'examples', 'docs']),
       python_requires='>=3.6.0',
-      install_requires=reqs('default.txt'),
+      install_requires=reqs('requirements.txt'),
       extras_require=extras_require(),
       long_description=open('README.md').read(),
       zip_safe=False)
