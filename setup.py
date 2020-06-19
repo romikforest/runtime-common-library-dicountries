@@ -49,5 +49,5 @@ setup(name=metadata.name,
       long_description=open('README.md').read(),
       package_data={
           "dicountries": ["data/*"],
-      }
+      },
       zip_safe=False)

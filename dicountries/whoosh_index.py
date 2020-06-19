@@ -70,6 +70,7 @@ class CountryIndex:
         self.last_update_lock = threading.Lock()
         self.last_update = None
         self.update_lock = threading.Lock()
+        self.search_cache = {}
 
         if use_async:
             asyncio.get_event_loop().run_in_executor(None, self.restore_backuped_index)
@@ -242,12 +243,18 @@ class CountryIndex:
                 if name.capitalize() in self.simple_index:
                     return self.post_process_name(self.simple_index[name.capitalize()], postprocess)
         print(f'! Use whoosh index for {name}')
-        result = self.normalize_country_detailed(name)
-        if not result[0]:
-            print(f'! missed {name}')
-            return self.post_process_name(name, postprocess)
-        result = result[1][0].get('basecountry')
-        return self.post_process_name(result or name, postprocess)
+        if name in self.search_cache:
+            result = self.search_cache[country]
+        else:
+            result = self.normalize_country_detailed(name)
+            if not result[0]:
+                print(f'! missed {name}')
+                result = self.post_process_name(name, postprocess)
+            else:
+                result = result[1][0].get('basecountry')
+                result = self.post_process_name(result or name, postprocess)
+            self.search_cache[name] = result
+        return result
 
     def refine_country(self, name):
         name = self.normalize_country(name, postprocess=False)
