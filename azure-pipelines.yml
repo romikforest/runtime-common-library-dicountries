@@ -49,7 +49,7 @@ steps:
     which python
     python -m pip --version
     python -m pip install --no-cache-dir -U pip
-    python -m pip install --no-cache-dir -U -r requirement/default.txt
+    python -m pip install --no-cache-dir -U -r requirements/default.txt
   displayName: 'Install dependencies'
 
 - script: python -m pip install --no-cache-dir -U pip setuptools wheel twine
