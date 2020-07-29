@@ -21,6 +21,7 @@ from .loader import (
 from .utils import reorder_name
 
 COUNTRY_IX_VER = 1  # change this if you've changed the index schema, so old index will not be loaded in the k8s pod
+MAX_SEARCH_CACHE = 1000
 
 # def run_async(corofn, *args):
 #     loop = asyncio.new_event_loop()
@@ -253,6 +254,8 @@ class CountryIndex:
             else:
                 result = result[1][0].get('basecountry')
                 result = self.post_process_name(result or name, postprocess)
+            if len(self.search_cache) > MAX_SEARCH_CACHE:
+                self.search_cache = {} # Reinit cache to protect memory (atacks?)
             self.search_cache[name] = result
         return result
 
