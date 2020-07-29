@@ -2348,7 +2348,7 @@ COUNTRY_MAPPING = {
 "Tsipre",
 ],
 
-"Czechia": [
+"Czech Republic": [
 "Czech Republic",
 "Česká republika",
 "Česko",
@@ -2400,7 +2400,7 @@ COUNTRY_MAPPING = {
 "Chiksuyu",
 "Cộng Hoà Séc",
 "Csehország",
-"Czechia *",
+"Czechia",
 "Czechy",
 "Iksiitsu",
 "捷克",
@@ -4842,10 +4842,6 @@ COUNTRY_MAPPING = {
 "Jugosławia",
 "유고 슬라비아",
 "ユーゴスラビア",
-"Yugoslav Republic Of Macedonia",
-"The former Yugoslav Republic of Macedonia",
-"πρώην Γιουγκοσλαβική Δημοκρατία της Μακεδονίας",
-"Macedonia, The Former Yugoslav Republic Of",
 ],
 
 "Kazakhstan": [
@@ -5675,6 +5671,11 @@ COUNTRY_MAPPING = {
 "an Mhacadóin",
 "FYROM",
 "மாசிடோனிய குடியரசு",
+
+"Yugoslav Republic Of Macedonia",
+"The former Yugoslav Republic of Macedonia",
+"πρώην Γιουγκοσλαβική Δημοκρατία της Μακεδονίας",
+"Macedonia, The Former Yugoslav Republic Of",
 ],
 
 "Madagascar": [

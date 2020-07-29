@@ -2279,7 +2279,7 @@
     "சைப்ரஸ்",
     "Tsipre"
   ],
-  "Czechia": [
+  "Czech Republic": [
     "Czech Republic",
     "Česká republika",
     "Česko",
@@ -2330,7 +2330,7 @@
     "Chiksuyu",
     "Cộng Hoà Séc",
     "Csehország",
-    "Czechia *",
+    "Czechia",
     "Czechy",
     "Iksiitsu",
     "捷克",
@@ -4717,11 +4717,7 @@
     "南斯",
     "Jugosławia",
     "유고 슬라비아",
-    "ユーゴスラビア",
-    "Yugoslav Republic Of Macedonia",
-    "The former Yugoslav Republic of Macedonia",
-    "πρώην Γιουγκοσλαβική Δημοκρατία της Μακεδονίας",
-    "Macedonia, The Former Yugoslav Republic Of"
+    "ユーゴスラビア"
   ],
   "Kazakhstan": [
     "Kazakhstan",
@@ -5532,7 +5528,11 @@
     "Mazedonien",
     "an Mhacadóin",
     "FYROM",
-    "மாசிடோனிய குடியரசு"
+    "மாசிடோனிய குடியரசு",
+    "Yugoslav Republic Of Macedonia",
+    "The former Yugoslav Republic of Macedonia",
+    "πρώην Γιουγκοσλαβική Δημοκρατία της Μακεδονίας",
+    "Macedonia, The Former Yugoslav Republic Of"
   ],
   "Madagascar": [
     "Madagascar",

@@ -28,10 +28,13 @@ with open('dicountries/data/country_list.txt', 'rt', encoding='utf-8') as f:
 
 for line in lines:
     line = line.strip()
-    # base = country_index.normalize_country(line)
-    base = country_index.refine_country(line)
-    if line != base:
-        print(f'{line}: {base}')
+
+    base = country_index.normalize_country(line)
+    # base = country_index.refine_country(line)
+
+    # if line != base:
+    #     print(f'{line}: {base}')
+    print(f'{line}: {base}')
 
 # print(country_index.normalize_country('Зимбабу'))
 # print(country_index.normalize_country('Åland'))
