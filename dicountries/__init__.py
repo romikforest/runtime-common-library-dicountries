@@ -1,5 +1,5 @@
 from .metadata import version as __version__
-import .whoosh_patches
+import whoosh_patches
 
 def _need_import():
     import __main__
