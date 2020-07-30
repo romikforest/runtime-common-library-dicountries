@@ -8,6 +8,7 @@ from dicountries.whoosh_index import CountryIndex
 # print(merged_index.get('Antigua And Barbuda'))
 country_index = CountryIndex()
 # country_index.refresh()
+# print(country_index.normalize_country('GDD Russia'))
 
 #print(country_index.normalize_country('Russia'))
 
@@ -23,6 +24,7 @@ country_index = CountryIndex()
 #         print(f'{k}: {w}')
 
 #====
+# with open('dicountries/data/user_country_list.txt', 'rt', encoding='utf-8') as f:
 with open('dicountries/data/country_list.txt', 'rt', encoding='utf-8') as f:
     lines = f.readlines()
 

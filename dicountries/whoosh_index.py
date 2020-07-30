@@ -6,11 +6,12 @@ import threading
 from threading import Thread
 from unidecode import unidecode
 from whoosh import index
+from whoosh.analysis import StandardAnalyzer
 from whoosh.fields import *
 from whoosh.index import EmptyIndexError
 from whoosh.query import FuzzyTerm
 from whoosh.qparser import QueryParser
-from whoosh.scoring import FunctionWeighting
+from whoosh.qparser import syntax
 
 from .loader import (
     create_basename_by_name_super_index,
@@ -23,6 +24,9 @@ from .utils import reorder_name
 COUNTRY_IX_VER = 1  # change this if you've changed the index schema, so old index will not be loaded in the k8s pod
 MAX_SEARCH_CACHE = 1000
 
+OrGroup = syntax.OrGroup.factory(0.9)
+
+
 # def run_async(corofn, *args):
 #     loop = asyncio.new_event_loop()
 #     try:
@@ -33,24 +37,30 @@ MAX_SEARCH_CACHE = 1000
 #         loop.close()
 
 class CountryIndex:
-
-    schema = Schema(decoded_country=TEXT(phrase=True),
+    schema = Schema(decoded_country=TEXT(phrase=False,
+                                         analyzer=StandardAnalyzer(
+                                             stoplist=frozenset(
+                                                 ['and', 'is', 'it', 'an', 'as', 'at', 'have', 'in', 'yet', 'if',
+                                                  'from', 'for', 'when', 'by', 'to', 'you', 'be', 'we', 'that', 'may',
+                                                  'not', 'with', 'tbd', 'a', 'on', 'your', 'this', 'of', 'will',
+                                                  'can', 'the', 'or', 'are']))),
                     country=STORED(),
                     basecountry=STORED(),
                     )
 
     class CountryTermClass(FuzzyTerm):
         def __init__(self, fieldname, text, boost=1.0, maxdist=2, prefixlength=0, constantscore=False):
-            if len(text) < 4: # 4
-                super().__init__(fieldname, text, boost, 0, prefixlength, constantscore)
-            elif len(text) < 7:
-                super().__init__(fieldname, text, boost, 2, prefixlength, constantscore)
-            elif len(text) < 12:
-                super().__init__(fieldname, text, boost, 3, prefixlength, constantscore)
-            else:
-                super().__init__(fieldname, text, boost, 4, prefixlength, constantscore)
+            maxdist = 3
+            if len(text) < 4:
+                maxdist = 0
+            elif len(text) < 11:
+                maxdist = 1
+            elif len(text) < 16:
+                maxdist = 2
 
-    def __init__(self, index_path=None, post_process_country_map=None, use_async=False): # simple_index_path=None
+            super().__init__(fieldname, text, boost, maxdist, prefixlength, constantscore)
+
+    def __init__(self, index_path=None, post_process_country_map=None, use_async=False):  # simple_index_path=None
         if post_process_country_map is None:
             self.post_process_country_map = load_post_process_country_mapping()
         else:
@@ -125,10 +135,8 @@ class CountryIndex:
                 with FileStorage(self.path) as file_storage:
                     copy_storage(self.ix.storage, file_storage)
 
-
     async def restore_backuped_index_async(self):
         asyncio.get_event_loop().run_in_executor(None, self.restore_backuped_index)
-
 
     def restore_backuped_index(self):
         # simple_path = os.path.join(self.simple_path, 'index.json')
@@ -198,7 +206,6 @@ class CountryIndex:
             with self.last_update_lock:
                 self.last_update = datetime.utcnow().replace(tzinfo=pytz.timezone('utc'))
 
-
     def normalize_country_detailed(self, name, limit=None):
         cur_ix = self.get_index()
         if not cur_ix:
@@ -217,13 +224,18 @@ class CountryIndex:
             qp = QueryParser('decoded_country', schema=self.schema, termclass=self.CountryTermClass)
             q = qp.parse(query)
             results = s.search(q, limit=None)
+            if not len(results):
+                qp = QueryParser('decoded_country', schema=self.schema, termclass=self.CountryTermClass,
+                                 group=OrGroup)
+                q = qp.parse(query)
+                results = s.search(q, limit=None)
             results = [dict(basecountry=hit['basecountry'],
                             country=hit['country'],
                             # rate=hit.score,
                             rate=fuzz.token_sort_ratio(
-                                    self.clean_name2(name),
-                                    self.clean_name2(hit['country'])
-                                ) # rate=hit.score
+                                self.clean_name2(name),
+                                self.clean_name2(hit['country'])
+                            )  # rate=hit.score
                             ) for hit in results]
             results = sorted(results, key=lambda k: k['rate'], reverse=True)
             results_len = len(results)
@@ -255,7 +267,7 @@ class CountryIndex:
                 result = result[1][0].get('basecountry')
                 result = self.post_process_name(result or name, postprocess)
             if len(self.search_cache) > MAX_SEARCH_CACHE:
-                self.search_cache = {} # Reinit cache to protect memory (atacks?)
+                self.search_cache = {}  # Reinit cache to protect memory (atacks?)
             self.search_cache[name] = result
         return result
 
