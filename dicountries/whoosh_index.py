@@ -257,7 +257,7 @@ class CountryIndex:
                     return self.post_process_name(self.simple_index[name.capitalize()], postprocess)
         print(f'! Use whoosh index for {name}')
         if name in self.search_cache:
-            result = self.search_cache[country]
+            result = self.search_cache[name]
         else:
             result = self.normalize_country_detailed(name)
             if not result[0]:
