@@ -1,5 +1,6 @@
 from dicountries.loader import create_basename_by_name_super_index
 from dicountries.whoosh_index import CountryIndex
+import subprocess
 
 
 #############################################################
@@ -35,7 +36,15 @@ for line in lines:
     # base = country_index.refine_country(line)
 
     # if line != base:
+    #    print(f'Normalize: {line}: {base}')
+    #    # subprocess.run(["python", "corrector.py", line, base])
+
+    if line == 'Zimbawe':
+        break
+
+    # if line != base:
     #     print(f'{line}: {base}')
+
     print(f'{line}: {base}')
 
 # print(country_index.normalize_country('Зимбабу'))

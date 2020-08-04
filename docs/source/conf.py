@@ -17,8 +17,11 @@ import os
 import sys
 
 source_folder = 'dicountries'
-sys.path.insert(0, os.path.abspath(f'../../{source_folder}'))
+sys.path.insert(0, os.path.abspath('../..'))
 sys.setrecursionlimit(1500)
+
+import recommonmark
+from recommonmark.transform import AutoStructify
 
 
 # -- Project information -----------------------------------------------------
@@ -30,7 +33,7 @@ metadata = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(metadata)
 
 project = metadata.name
-copyright = metadata.copyright
+copyright = metadata.lib_copyright
 author = metadata.author
 description = metadata.description
 
@@ -57,6 +60,10 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.githubpages',
     'rinoh.frontend.sphinx',
+    'sphinx.ext.napoleon',
+    'sphinx.ext.mathjax',
+    'recommonmark',
+    'sphinx.ext.autosectionlabel',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -66,7 +73,13 @@ templates_path = ['_templates']
 # You can specify multiple suffix as a list of string:
 #
 # source_suffix = ['.rst', '.md']
-source_suffix = '.rst'
+source_suffix = {
+    '.rst': 'restructuredtext',
+    '.txt': 'markdown',
+    '.md': 'markdown',
+}
+
+
 
 # The master toctree document.
 master_doc = 'index'
@@ -93,6 +106,7 @@ pygments_style = 'sphinx'
 # a list of builtin themes.
 #
 html_theme = 'alabaster'
+html_logo='images/logo.svg'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -200,3 +214,27 @@ epub_exclude_files = ['search.html']
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {'https://docs.python.org/': None}
+
+# app setup hook
+# def setup(app):
+#     app.add_config_value('recommonmark_config', {
+#             'url_resolver': lambda url: github_doc_root + url,
+#             'auto_toc_tree_section': 'Contents',
+#             }, True)
+#     app.add_transform(AutoStructify)
+
+def setup(app):
+    app.add_config_value('recommonmark_config', {
+        #'url_resolver': lambda url: github_doc_root + url,
+        'auto_toc_tree_section': 'Contents',
+        'auto_toc_maxdepth': 6,
+        'enable_auto_toc_tree': True,
+        'enable_math': False,
+        'enable_inline_math': False,
+        'enable_eval_rst': True,
+        # 'autosectionlabel_prefix_document': True,
+    }, True)
+    app.add_transform(AutoStructify)
+
+
+autosectionlabel_prefix_document = True

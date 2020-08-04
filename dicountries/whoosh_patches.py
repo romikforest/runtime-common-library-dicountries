@@ -1,3 +1,5 @@
+"""Monkey patch for the whoosh library to have two next symbol transpositions as one error while searching"""
+
 import whoosh.automata.lev
 
 if not hasattr(whoosh.automata.lev, 'transposition_levenshtein_automaton'):
@@ -16,7 +18,7 @@ if not hasattr(whoosh.automata.lev, 'transposition_levenshtein_automaton'):
         for i in xrange(prefix, len(term)):
             c = term[i]
             if i < tlm1:
-                nc = term[i+1]
+                nc = term[i + 1]
             else:
                 nc = None
             for e in xrange(k + 1):
@@ -39,6 +41,7 @@ if not hasattr(whoosh.automata.lev, 'transposition_levenshtein_automaton'):
                 nfa.add_transition((len(term), e), ANY, (len(term), e + 1))
             nfa.add_final_state((len(term), e))
         return nfa
+
 
     whoosh.automata.lev.origin_levenshtein_automaton = whoosh.automata.lev.levenshtein_automaton
     whoosh.automata.lev.levenshtein_automaton = new_levenshtein_automaton

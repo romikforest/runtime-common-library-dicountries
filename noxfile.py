@@ -4,6 +4,7 @@ lib_name = 'dicountries'
 
 dilibraries = tuple()
 
+
 @nox.session(python=test_pythons)
 @nox.parametrize('extras', [None])
 def test(session, extras, dilibraries=dilibraries):
@@ -31,3 +32,35 @@ def build_library(session):
     """Build library package. (Add version file manually.)"""
     session.log(f'Run build_library in {lib_name}')
     standard_build_di_library(session, dilibraries=dilibraries)
+
+
+@nox.session(python=main_python, reuse_venv=True)
+@nox.parametrize('extras', [None])
+def flake8(session, extras):
+    """Check code with flake8"""
+    session.log(f'Run flake8 for {lib_name}')
+    standard_di_flake8(session, path=lib_name, dilibraries=dilibraries)
+
+
+@nox.session(python=main_python, reuse_venv=True)
+@nox.parametrize('extras', [None])
+def pylint(session, extras):
+    """Check code with pylint"""
+    session.log(f'Run pylint for {lib_name}')
+    standard_di_pylint(session, path=lib_name, dilibraries=dilibraries)
+
+
+@nox.session(python=main_python, reuse_venv=True)
+@nox.parametrize('extras', [None])
+def bandit(session, extras):
+    """Check code with bandit"""
+    session.log(f'Run bandit for {lib_name}')
+    standard_di_bandit(session, path=lib_name, dilibraries=dilibraries)
+
+
+@nox.session(python=main_python, reuse_venv=True)
+@nox.parametrize('extras', [None])
+def isort(session, extras):
+    """Check code with isort"""
+    session.log(f'Run isort for {lib_name}')
+    standard_di_isort(session, path=lib_name, dilibraries=dilibraries)

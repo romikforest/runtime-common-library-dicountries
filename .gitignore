@@ -1,5 +1,6 @@
 /dicountries/indexes/
 /indexes/
+corrector.py
 
 .DS_Store
 thumbs.db

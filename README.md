@@ -1,5 +1,4 @@
-DICountries
-===========
+<header><font size="+12">DiCountries introduction</font></header>
 
 # About
 
@@ -42,7 +41,7 @@ extra-index-url=https://di_libraries:<access token>@pkgs.dev.azure.com/swodatain
 The template `<access token>` should be substituted with your valid access token that
 should have **Packaging Read** access rights. You can create this token in your AzureDevOps account.
 
-## Use
+## Usage
 
 A simple usage example:
 
@@ -67,7 +66,7 @@ The function `normalize_country` returns a normalized country name if possible
 (looking in country indexes and using fuzzy search),
 otherwise it returns the country name from the incoming parameter.
 
-This function will try to return the country name accordingly the ISO 3166 standard.
+This function will try to return the country name accordingly to the ISO 3166 standard.
 But if a substitution for this name is determined in the file
 `post_process_country_mapping.json` in the package's data directory that
 substitution will be returned.
@@ -89,7 +88,7 @@ You can also do this transformation on any string using function `reorder_name(n
 from the `dicountries.utils` module.
 
 Every time you run this script it will create a subdirectory `indexes` in
-the currebt working directory to backup indexes there. You can pass the index
+the current working directory to backup indexes there. You can pass the index
 directory explicitly to the `CountryIndex` constructor like this:
 
 ```python
@@ -113,4 +112,19 @@ constructor. Also there is an async function for index refreshig:
 ```python
 await country_index.refresh_async()
 ```
+
+The search process is normally optimized and uses a cache. You can control the size of
+the cache using the `max_search_cache` parameter, e.g.:
+
+```python
+country_index = CountryIndex(max_search_cache=1000)
+```
+
+During the normalization the search process usually checks the cache first. If some
+country is not found in the cache more complicated techniques will be used.
+Every found country is placed to the simple cache, but if the cache riches
+`max_search_cache` size it will be reinitialized and the search process will start
+from scratch.
+
+
 

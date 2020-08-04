@@ -1,4 +1,4 @@
-# This is a helper file. It generates the data/post_process_country_mapping.json file
+"""This is a helper file. It generates the data/post_process_country_mapping.json file"""
 
 POST_PROCESS_COUNTRY_MAPPING = {
     # "United States": "UUU"

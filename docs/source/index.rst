@@ -1,19 +1,23 @@
-.. Application documentation master file, created by
-   sphinx-quickstart on Wed Jun 10 01:36:06 2020.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+=======================================================================
+  Welcome to DiCountries library documentation!
+=======================================================================
 
-Welcome to library documentation!
-======================================
+.. sourcecode:: python
+
+    # DiCountries
+    import dicountries
+
+-----------------------------------
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+    :maxdepth: 3
 
-Library main
-===================
-.. automodule:: dicountires
-   :members:
+    intro
+
+.. toctree::
+    :maxdepth: 3
+
+    reference/index
 
 
 Indices and tables
