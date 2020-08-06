@@ -1,19 +1,21 @@
 """Whoosh based country search index"""
 
 import asyncio
-from fuzzywuzzy import fuzz
 import logging
 import os
-import pytz
 import threading
+from datetime import datetime
+
+import pytz
+from fuzzywuzzy import fuzz
 from unidecode import unidecode
 from whoosh import index
 from whoosh.analysis import StandardAnalyzer
-from whoosh.fields import Schema, STORED, TEXT
-from whoosh.index import EmptyIndexError
+from whoosh.fields import STORED, TEXT, Schema
+from whoosh.filedb.filestore import FileStorage, RamStorage, copy_storage
+from whoosh.index import EmptyIndexError, FileIndex
+from whoosh.qparser import QueryParser, syntax
 from whoosh.query import FuzzyTerm
-from whoosh.qparser import QueryParser
-from whoosh.qparser import syntax
 
 from .loader import (
     create_basename_by_name_super_index,
@@ -24,13 +26,40 @@ from .utils import reorder_name
 logger = logging.getLogger('dicountries')
 logging.basicConfig(format='%(levelname)s  dicountries: %(message)s')
 
-COUNTRY_IX_VER = 1  # change this if you've changed the index schema, so old index will not be loaded in the k8s pod
+COUNTRY_IX_VER = 1  # change this if you've changed the index schema
+# , so old index will not be loaded in the k8s pod
 DEFAULT_MAX_SEARCH_CACHE = 1000  # Max size of the country cache.
 
 OrGroup = syntax.OrGroup.factory(0.9)
 
 
-class CountryIndex:
+def _clean_name(name):
+    """Preprocess names before indexing
+
+    Args:
+        name (str): name to preprocess
+
+    Returns:
+        str: preprocessed name
+
+    """
+    return unidecode(name or '').strip().replace('(', ' ').replace(')', ' ')
+
+
+def _clean_name2(name):
+    """Preprocess names before additional sorting
+
+    Args:
+        name (str): name to preprocess
+
+    Returns:
+        str: preprocessed name
+
+    """
+    return unidecode(name or '').strip().replace('(', ' ').replace(')', ' ')
+
+
+class CountryIndex:  # pylint: disable=too-many-instance-attributes
     """
     Country index class.
     Can be used to index ISO and synonyms country databases and normalize/refine countries
@@ -70,9 +99,12 @@ class CountryIndex:
     schema = Schema(decoded_country=TEXT(phrase=False,
                                          analyzer=StandardAnalyzer(
                                              stoplist=frozenset(
-                                                 ['and', 'is', 'it', 'an', 'as', 'at', 'have', 'in', 'yet', 'if',
-                                                  'from', 'for', 'when', 'by', 'to', 'you', 'be', 'we', 'that', 'may',
-                                                  'not', 'with', 'tbd', 'a', 'on', 'your', 'this', 'of', 'will',
+                                                 ['and', 'is', 'it', 'an', 'as', 'at', 'have', 'in',
+                                                  'yet', 'if',
+                                                  'from', 'for', 'when', 'by', 'to', 'you', 'be',
+                                                  'we', 'that', 'may',
+                                                  'not', 'with', 'tbd', 'a', 'on', 'your', 'this',
+                                                  'of', 'will',
                                                   'can', 'the', 'or', 'are']))),
                     country=STORED(),
                     basecountry=STORED(),
@@ -91,7 +123,13 @@ class CountryIndex:
                 constantscore (bool): use constant score
         """
 
-        def __init__(self, fieldname, text, boost=1.0, maxdist=2, prefixlength=0, constantscore=False):
+        def __init__(self,  # pylint: disable=too-many-arguments
+                     fieldname,
+                     text,
+                     boost=1.0,
+                     maxdist=2,
+                     prefixlength=0,
+                     constantscore=False):
             maxdist = 3
             if len(text) < 4:
                 maxdist = 0
@@ -132,30 +170,6 @@ class CountryIndex:
                 asyncio.get_event_loop().run_in_executor(None, self.refresh)
             else:
                 self.refresh()
-
-    def _clean_name(self, name):
-        """Preprocess names before indexing
-
-        Args:
-            name (str): name to preprocess
-
-        Returns:
-            str: preprocessed name
-
-        """
-        return unidecode(name or '').strip().replace('(', ' ').replace(')', ' ')
-
-    def _clean_name2(self, name):
-        """Preprocess names before additional sorting
-
-        Args:
-            name (str): name to preprocess
-
-        Returns:
-            str: preprocessed name
-
-        """
-        return unidecode(name or '').strip().replace('(', ' ').replace(')', ' ')
 
     def post_process_name(self, name, postprocess=True):
         """Postprocess names after whoosh searching.
@@ -205,15 +219,12 @@ class CountryIndex:
             Empty inmemory whoosh index
 
         """
-        from whoosh.filedb.filestore import RamStorage
-        from whoosh.index import FileIndex
 
         storage = RamStorage()
         return FileIndex.create(storage, self.schema, 'MAIN')
 
     def backup_index(self):
         """Backup whoosh index in on disk file"""
-        from whoosh.filedb.filestore import copy_storage, FileStorage
         os.makedirs(self.path, exist_ok=True)
         with self.ix_lock:
             if self.ix:
@@ -229,7 +240,6 @@ class CountryIndex:
         with self.simple_index_lock:
             if not self.simple_index:
                 self.simple_index = create_basename_by_name_super_index()
-        from whoosh.filedb.filestore import copy_storage
         os.makedirs(self.path, exist_ok=True)
         try:
             saved_ix = index.open_dir(self.path)
@@ -265,13 +275,13 @@ class CountryIndex:
             update_datetime (datetime): last refresh time to control if a new refresh is required
 
         """
-        from datetime import datetime
 
         with self.update_lock:
             if update_datetime:
                 with self.last_update_lock:
                     if self.last_update and self.last_update > update_datetime:
-                        # logger.info(f'No need to update countries. Index updated on {self.last_update}.')
+                        # logger.info(f'No need to update countries. '
+                        # f'Index updated on {self.last_update}.')
                         return
             logger.info('* Updating indices for countries...')
 
@@ -287,7 +297,7 @@ class CountryIndex:
             for k, v in data.items():
                 mapped_data = {}
                 mapped_data['country'] = k
-                mapped_data['decoded_country'] = self._clean_name(k)
+                mapped_data['decoded_country'] = _clean_name(k)
                 mapped_data['basecountry'] = v
                 writer.add_document(**mapped_data)
 
@@ -303,7 +313,8 @@ class CountryIndex:
                 self.last_update = datetime.utcnow().replace(tzinfo=pytz.timezone('utc'))
 
     def normalize_country_detailed(self, name, limit=None):
-        """Detailed country normalization. Return whoosh index possible variants for the name and their rates
+        """Detailed country normalization.
+        Return whoosh index possible variants for the name and their rates
 
         Args:
             name (str): country name to normalize
@@ -320,7 +331,7 @@ class CountryIndex:
         if not cur_ix:
             raise RuntimeError('Reindexation proccess')
 
-        country = self._clean_name(name)
+        country = _clean_name(name)
         query = ''
         if country:
             query += f' decoded_country:({country})'
@@ -333,8 +344,9 @@ class CountryIndex:
             qp = QueryParser('decoded_country', schema=self.schema, termclass=self.CountryTermClass)
             q = qp.parse(query)
             results = s.search(q, limit=None)
-            if not len(results):
-                qp = QueryParser('decoded_country', schema=self.schema, termclass=self.CountryTermClass,
+            if not results:
+                qp = QueryParser('decoded_country', schema=self.schema,
+                                 termclass=self.CountryTermClass,
                                  group=OrGroup)
                 q = qp.parse(query)
                 results = s.search(q, limit=None)
@@ -342,8 +354,8 @@ class CountryIndex:
                             country=hit['country'],
                             # rate=hit.score,
                             rate=fuzz.token_sort_ratio(
-                                self._clean_name2(name),
-                                self._clean_name2(hit['country'])
+                                _clean_name2(name),
+                                _clean_name2(hit['country'])
                             )  # rate=hit.score
                             ) for hit in results]
             results = sorted(results, key=lambda k: k['rate'], reverse=True)
@@ -380,13 +392,13 @@ class CountryIndex:
                     return self.post_process_name(self.simple_index[name], postprocess)
                 if name.capitalize() in self.simple_index:
                     return self.post_process_name(self.simple_index[name.capitalize()], postprocess)
-        logger.info(f'! Use whoosh index for {name}')
+        logger.info('! Use whoosh index for %s', name)
         if name in self.search_cache:
             result = self.search_cache[name]
         else:
             result = self.normalize_country_detailed(name)
             if not result[0]:
-                logger.info(f'! missed {name}')
+                logger.info('! missed %s', name)
                 result = self.post_process_name(name, postprocess)
             else:
                 result = result[1][0].get('basecountry')
@@ -403,7 +415,8 @@ class CountryIndex:
         (using reorder_name function from the `country.utils` module).
 
         Example:
-            If the normalized name is "Korea, Republic of" the return value will be "Republic of Korea"
+            If the normalized name is "Korea, Republic of" the return value
+            will be "Republic of Korea".
             Only the variant with max rate will be returned.
 
             If `postprocess` is True additional name postprocessing will be done.

@@ -59,8 +59,33 @@ def bandit(session, extras):
 
 
 @nox.session(python=main_python, reuse_venv=True)
-@nox.parametrize('extras', [None])
-def isort(session, extras):
+def isort_check(session):
     """Check code with isort"""
+    session.log(f'Run isort_check for {lib_name}')
+    standard_di_isort_check(session, path=lib_name)
+
+
+@nox.session(python=main_python, reuse_venv=True)
+def isort(session):
+    """Sort imports with isort"""
     session.log(f'Run isort for {lib_name}')
-    standard_di_isort(session, path=lib_name, dilibraries=dilibraries)
+    standard_di_isort(session, path=lib_name)
+
+
+@nox.session(python=main_python, reuse_venv=True)
+@nox.parametrize('extras', [None])
+def mypy(session, extras):
+    """Check code with mypy"""
+    session.log(f'Run mypy for {lib_name}')
+    standard_di_mypy(session, path=lib_name, extras=extras, dilibraries=dilibraries)
+
+# @nox.session(python=main_python, reuse_venv=True)
+# @nox.parametrize('extras', [None])
+# def proselint(session, extras):
+#     """Check code with proselint"""
+#     session.log(f'Run proselint for {lib_name}')
+#     common_setup(session, extras=extras, dilibraries=dilibraries)
+#     session.install('proselint')
+#     from pathlib import Path
+#     for path in Path('.').rglob('*.rst'):
+#         session.run('python', '-m', 'proselint', str(path))

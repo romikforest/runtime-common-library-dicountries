@@ -1,11 +1,11 @@
 =====================================================
- ``dict_index``
+ ``base_types``
 =====================================================
 
 .. contents::
     :local:
-.. currentmodule:: dicountries.dict_index
+.. currentmodule:: dicountries.base_types
 
-.. automodule:: dicountries.dict_index
+.. automodule:: dicountries.base_types
    :members:
    :undoc-members:

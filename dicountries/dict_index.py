@@ -2,14 +2,44 @@
 Some operations on list and dict databases and indexes loaded from text and json files
 """
 
-from .utils import reorder_name
 import logging
+from copy import copy
+from typing import List, Set, Tuple, Union, cast
+
+from .base_types import (
+    DictDB,
+    FieldsDescription,
+    Index,
+    ListDB,
+    SimpleDB,
+    SplitPolicies,
+    StringMap
+)
+from .utils import reorder_name
+
+try:
+    from typing import \
+        Final  # type: ignore # pylint: disable=no-name-in-module
+except ImportError:
+    from typing_extensions import \
+        Final  # type: ignore # pylint: disable=no-name-in-module
+
+REPORT_TEMPLATE_KEY_ADDED: Final = \
+    'Key has already been added to the index [%s] (Old: [%s], New: [%s])'
+REPORT_TEMPLATE_THERE_IS_FIELD: Final = 'There is a field [%s] in the index (%s)'
+REPORT_TEMPLATE_MERGE_WARNING: Final = \
+    'Index merge warning: key [%s] present in both ([%s, %s], [%s, %s])'
+REPORT_TEMPLATE_RECORDS_WITHOUT_FIELDS = \
+    'There were records without filed [{%s}] in `add_base_country`'
+REPORT_TEMPLATE_RECORDS_WITHOUT_DASH = \
+    'There were records without dash in the filed [{%s}] in `add_base_country`'
+
 
 logger = logging.getLogger('dicountries')
 logging.basicConfig(format='%(levelname)s  dicountries: %(message)s')
 
 
-def get_keys(db):
+def get_keys(db: SimpleDB) -> Set[str]:
     """Get unique keys from a list-like or dict like database
 
     Args:
@@ -19,43 +49,43 @@ def get_keys(db):
         A set of unique indexes
 
     """
-    keys = set()
+    keys: Set[str] = set()
     if isinstance(db, list):
+        db = cast(ListDB, db)
         for item in db:
             for key in item:
                 keys.add(key)
     else:
-        for k, v in db.items():
+        db = cast(DictDB, db)
+        for v in db.values():
             for key in v:
                 keys.add(key)
     return keys
 
 
-def normalize_keys(db, map):
+def normalize_keys(db: ListDB, key_mapping: StringMap) -> ListDB:
     """Create a new list database on base of `db` list database transforming keys
-    accordingly to the `map` mapping
+    accordingly to the `key_mapping` mapping
 
     Args:
         db: incoming list database
-        map: desired key mapping
+        key_mapping: desired key mapping
 
     Returns:
-        normalized database
+        normalized list database
 
     """
-    new_db = []
+    new_db: ListDB = []
     for item in db:
-        new_item = {}
+        new_item: StringMap = {}
         for key, value in item.items():
-            new_key = map.get(key)
-            if not new_key:
-                new_key = key
+            new_key = key_mapping.get(key, key)
             new_item[new_key] = value
         new_db.append(new_item)
     return new_db
 
 
-def create_dict_db(db, field_name, allow_doubles=False):
+def create_dict_db(db: ListDB, field_name: str, allow_doubles: bool = False) -> DictDB:
     """Transform a list country database to a dict country database
 
     Args:
@@ -71,21 +101,23 @@ def create_dict_db(db, field_name, allow_doubles=False):
         RuntimeError: If key has already been added to the index and `allow_doubles` is False
 
     """
-    index = {}
+
+    new_db: DictDB = {}
     for item in db:
         key = item[field_name]
-        if key in index:
+        if key in new_db:
             if allow_doubles:
-                logger.warning(f'Key has already been added to the index [{key}] (Old: [{index[key]}, New: [{item}])')
+                logger.warning(REPORT_TEMPLATE_KEY_ADDED, key, new_db[key], item)
             else:
-                raise RuntimeError(
-                    f'Key has already been added to the index [{key}] (Old: [{index[key]}, New: [{item}])')
+                raise RuntimeError(REPORT_TEMPLATE_KEY_ADDED % key, new_db[key], item)
         else:
-            index[key] = item
-    return index
+            new_db[key] = item
+    return new_db
 
 
-def create_index(db, first_field, second_fields, policy='None', remove_doubles=False):
+def create_index(db: SimpleDB, first_field: str, second_fields: FieldsDescription,
+                 policy: SplitPolicies = 'None',
+                 remove_doubles: bool = False) -> Index:
     """Create a new dict index for list-like or dict-like database db
 
     Args:
@@ -107,8 +139,11 @@ def create_index(db, first_field, second_fields, policy='None', remove_doubles=F
         a new dict index
 
     """
+    index: Index = {}
+    doubles: Set[str] = set()
+    skipped_first: bool = False
 
-    def process_item(item):
+    def process_item(item: StringMap) -> None:  # pylint: disable=too-many-branches
         nonlocal skipped_first, doubles, index
 
         first = item.get(first_field)
@@ -120,7 +155,7 @@ def create_index(db, first_field, second_fields, policy='None', remove_doubles=F
             if second is None:
                 return
             if second in index:
-                logger.warning(f'There is a field [{second}] in the index ({item})')
+                logger.warning(REPORT_TEMPLATE_THERE_IS_FIELD, second, item)
                 doubles.add(second)
             else:
                 has_comma = ',' in second
@@ -128,7 +163,7 @@ def create_index(db, first_field, second_fields, policy='None', remove_doubles=F
                     index[second] = first
                     second = reorder_name(second)
                     if second in index:
-                        logger.warning(f'There is a field [{second}] in the index ({item})')
+                        logger.warning(REPORT_TEMPLATE_THERE_IS_FIELD, second, item)
                         doubles.add(second)
                     else:
                         index[second] = first
@@ -138,22 +173,22 @@ def create_index(db, first_field, second_fields, policy='None', remove_doubles=F
                     for entry in second.split(','):
                         if entry in index:
                             entry = entry.strip()
-                            logger.warning(f'There is a field [{entry}] in the index ({item})')
+                            logger.warning(REPORT_TEMPLATE_THERE_IS_FIELD, entry, item)
                             doubles.add(entry)
                         else:
                             index[entry] = first
                 else:
                     index[second] = first
 
-    index = {}
-    doubles = set()
-    skipped_first = False
     if not isinstance(second_fields, list):
+        second_fields = cast(str, second_fields)
         second_fields = [second_fields]
     if isinstance(db, list):
+        db = cast(ListDB, db)
         for item in db:
             process_item(item)
     else:
+        db = cast(DictDB, db)
         for v in db.values():
             process_item(v)
 
@@ -166,7 +201,7 @@ def create_index(db, first_field, second_fields, policy='None', remove_doubles=F
     return index
 
 
-def print_index(index):
+def print_index(index: Index) -> None:
     """Print index content
 
     Args:
@@ -177,7 +212,7 @@ def print_index(index):
         print(f'{k}: {v}')
 
 
-def print_names_with_comma(index, policy='None'):
+def print_names_with_comma(index: Index, policy: SplitPolicies = 'None') -> None:
     """Print names with commas in the index keys:
 
     Args:
@@ -199,7 +234,7 @@ def print_names_with_comma(index, policy='None'):
                     print(item.strip())
 
 
-def merge_indexes(*indexes):
+def merge_indexes(*indexes: Union[Index, List[Index]]) -> Index:
     """Create a new combined index from several indexes (combine key-value pairs from all of them)
 
     Args:
@@ -210,18 +245,20 @@ def merge_indexes(*indexes):
 
     """
     if len(indexes) == 1:
-        indexes = indexes[0]
-    super_index = indexes[0].copy()
+        indexes = cast(Tuple[List[Index]], indexes[0])
+    indexes = cast(List[Index], indexes)
+    super_index: Index = indexes[0]
     for next_index in indexes[1:]:
         for k, v in next_index.items():
             if k in super_index:
-                logger.warning(f'Index merge warning: key [{k}] present in both ([{k}, {super_index[k]}], [{k}, {v}])')
+                logger.warning(REPORT_TEMPLATE_MERGE_WARNING, k, k, super_index[k], k, v)
             super_index[k] = v
     return super_index
 
 
-def chain_indexes(*indexes):
-    """Create a new combined index from several indexes applying indexation sequentially to every index in the list
+def chain_indexes(*indexes: Union[Index, List[Index]]) -> Index:
+    """Create a new combined index from several indexes applying indexation sequentially
+    to every index in the list
     (keys from the first one and corresponding values from the last one)
 
     Args:
@@ -232,10 +269,11 @@ def chain_indexes(*indexes):
 
     """
     if len(indexes) == 1:
-        indexes = indexes[0]
-    super_index = indexes[0].copy()
+        indexes = cast(Tuple[List[Index]], indexes[0])
+    indexes = cast(List[Index], indexes)
+    super_index: Index = copy(indexes[0])
     for next_index in indexes[1:]:
-        for k, v in super_index.copy().items():
+        for k, v in copy(super_index).items():
             if v not in next_index:
                 del super_index[k]
             else:
@@ -243,7 +281,7 @@ def chain_indexes(*indexes):
     return super_index
 
 
-def reverse_index(index):
+def reverse_index(index: Index) -> Index:
     """Reverse an index (keys become values and values became keys)
 
     Args:
@@ -256,7 +294,7 @@ def reverse_index(index):
     return {v: k for k, v in index.items()}
 
 
-def add_base_country(db, source_field, dest_field):
+def add_base_country(db: SimpleDB, source_field: str, dest_field: str) -> None:
     """Add a field with base country part using `dest_field` description
     for the list-like or dict like database `db` records
 
@@ -270,6 +308,8 @@ def add_base_country(db, source_field, dest_field):
              value "GT" will be saved as the value of the `dest_field`
 
     """
+    no_source: bool = False
+    no_dash: bool = False
 
     def process_item(item):
         nonlocal no_source, no_dash
@@ -283,15 +323,15 @@ def add_base_country(db, source_field, dest_field):
         else:
             no_source = True
 
-    no_source = False
-    no_dash = False
     if isinstance(db, list):
+        db = cast(ListDB, db)
         for item in db:
             process_item(item)
     else:
-        for k, v in db.items():
+        db = cast(DictDB, db)
+        for v in db.values():
             process_item(v)
     if no_source:
-        logger.warning(f'There were records without filed [{source_field}] in `add_base_country`')
+        logger.warning(REPORT_TEMPLATE_RECORDS_WITHOUT_FIELDS, source_field)
     if no_dash:
-        logger.warning(f'There were records without dash in the filed [{source_field}] in `add_base_country`')
+        logger.warning(REPORT_TEMPLATE_RECORDS_WITHOUT_DASH, source_field)

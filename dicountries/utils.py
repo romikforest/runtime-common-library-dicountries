@@ -1,7 +1,7 @@
 """Some useful utils used by other modules"""
 
 
-def get_main_code(code):
+def get_main_code(code: str) -> str:
     """Get code of the main country
 
     Args:
@@ -17,7 +17,7 @@ def get_main_code(code):
     return code.split('-')[0]
 
 
-def reorder_name(name):
+def reorder_name(name: str) -> str:
     """Reorder `name` splitting by comma
 
     Args:

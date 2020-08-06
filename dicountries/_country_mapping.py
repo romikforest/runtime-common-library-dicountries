@@ -1,6 +1,7 @@
 """This is a helper file. It generates the data/country_mapping.json file"""
 
-# from unidecode import unidecode
+# pylint: disable=too-many-lines
+# pylint: disable=wrong-import-position
 
 # 'Åland' = 'Aaland Islands'
 # 'Bosnia And Herzegowina' = 'Bosnia and Herzigowina'
@@ -8764,7 +8765,7 @@ COUNTRY_MAPPING = {
         "Švýcarsko",
         "Šwicarska",
         "Swiss",
-        "y Swistir",
+        "Swistir",
         "ස්විට්සර්ලන්තය",
         "Switserlân",
         "Switserland",
@@ -9764,7 +9765,8 @@ COUNTRY_MAPPING = {
         "கிரேட் பிரிட்டனும்வ வடக்கு அயர்லாந்தும்",
         "برطانیہ",
         "Moha Briten o Uttor Ayarlender Juktorajjo মহা ব্রিটেন ও উত্তর আয়ারল্যান্ডের যুক্তরাজ্য",
-        "Ulıbrïtanïya men Soltüstik Ïrlandïyanıñ Birikken Korol’digi -Ұлыбритания мен Солтүстік Ирландияның Біріккен Корольдігі",
+        "Ulıbrïtanïya men Soltüstik Ïrlandïyanıñ Birikken Korol’digi -Ұлыбритания "
+        "мен Солтүстік Ирландияның Біріккен Корольдігі",
     ],
 
     "Wales": [
@@ -11670,5 +11672,6 @@ import os
 
 DATA_DIR = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
 
-with open(os.path.join(DATA_DIR, 'country_mapping.json'), 'wt', encoding='utf8') as f:
+with open(os.path.join(DATA_DIR, 'country_mapping.json'), 'wt',
+          encoding='utf8') as f:
     json.dump(COUNTRY_MAPPING, f, indent=2, ensure_ascii=False)

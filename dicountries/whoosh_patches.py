@@ -1,4 +1,13 @@
-"""Monkey patch for the whoosh library to have two next symbol transpositions as one error while searching"""
+"""Monkey patch for the whoosh library to have two next symbol transpositions
+   as one error while searching
+
+Note:
+    This file should be imported first, before any other whoosh imports
+    Use isort:skip comment to prevent isort from reordering the import placement
+
+"""
+
+# pylint: skip-file
 
 import whoosh.automata.lev
 

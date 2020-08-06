@@ -1,6 +1,8 @@
 """This is a helper file. It generates the data/post_process_country_mapping.json file"""
 
-POST_PROCESS_COUNTRY_MAPPING = {
+from typing import Dict
+
+POST_PROCESS_COUNTRY_MAPPING: Dict[str, str] = {
     # "United States": "UUU"
 }
 

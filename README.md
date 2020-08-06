@@ -95,14 +95,14 @@ directory explicitly to the `CountryIndex` constructor like this:
 country_index = CountryIndex(index_path="<Your index directory>")
 ```
 
-If you don't want the index being rebuilded every time the script is runnig
+If you don't want the index being rebuilt every time the script is runnig
 just ommit the line:
 
 ```python
 country_index.refresh()
 ```
 
-Without this line the index will be rebuilded only if it does not exist, otherwise
+Without this line the index will be rebuilt only if it does not exist, otherwise
 it will be read from the index directory (it's faster).
 
 If you want the index to be updated as a background process or you want to have
