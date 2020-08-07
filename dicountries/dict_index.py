@@ -2,23 +2,9 @@
 
 import logging
 from copy import copy
-from typing import (
-    List,
-    Set,
-    Tuple,
-    Union,
-    cast
-)
+from typing import List, Set, Tuple, Union, cast
 
-from .base_types import (
-    DictDB,
-    FieldsDescription,
-    Index,
-    ListDB,
-    SimpleDB,
-    SplitPolicies,
-    StringMap
-)
+from .base_types import DictDB, FieldsDescription, Index, ListDB, SimpleDB, SplitPolicies, StringMap
 from .utils import reorder_name
 
 # try:
@@ -26,15 +12,15 @@ from .utils import reorder_name
 # except ImportError:
 #     from typing_extensions import Final  # type: ignore # pylint: disable=no-name-in-module
 
-REPORT_TEMPLATE_KEY_ADDED = \
-    'Key has already been added to the index [%s] (Old: [%s], New: [%s])'
+REPORT_TEMPLATE_KEY_ADDED = 'Key has already been added to the index [%s] (Old: [%s], New: [%s])'
 REPORT_TEMPLATE_THERE_IS_FIELD = 'There is a field [%s] in the index (%s)'
-REPORT_TEMPLATE_MERGE_WARNING = \
-    'Index merge warning: key [%s] present in both ([%s, %s], [%s, %s])'
-REPORT_TEMPLATE_RECORDS_WITHOUT_FIELDS = \
+REPORT_TEMPLATE_MERGE_WARNING = 'Index merge warning: key [%s] present in both ([%s, %s], [%s, %s])'
+REPORT_TEMPLATE_RECORDS_WITHOUT_FIELDS = (
     'There were records without filed [{%s}] in `add_base_country`'
-REPORT_TEMPLATE_RECORDS_WITHOUT_DASH = \
+)
+REPORT_TEMPLATE_RECORDS_WITHOUT_DASH = (
     'There were records without dash in the filed [{%s}] in `add_base_country`'
+)
 
 logger = logging.getLogger('dicountries')
 logging.basicConfig(format='%(levelname)s  dicountries: %(message)s')
@@ -117,9 +103,13 @@ def create_dict_db(db: ListDB, field_name: str, allow_doubles: bool = False) -> 
     return new_db
 
 
-def create_index(db: SimpleDB, first_field: str, second_fields: FieldsDescription,  # noqa: C901
-                 policy: SplitPolicies = 'None',
-                 remove_doubles: bool = False) -> Index:
+def create_index(  # noqa: C901
+    db: SimpleDB,
+    first_field: str,
+    second_fields: FieldsDescription,
+    policy: SplitPolicies = 'None',
+    remove_doubles: bool = False,
+) -> Index:
     """Create a new dict index for list-like or dict-like database db.
 
     Args:

@@ -80,7 +80,6 @@ source_suffix = {
 }
 
 
-
 # The master toctree document.
 master_doc = 'index'
 
@@ -106,7 +105,7 @@ pygments_style = 'sphinx'
 # a list of builtin themes.
 #
 html_theme = 'alabaster'
-html_logo='images/logo.svg'
+html_logo = 'images/logo.svg'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -140,19 +139,12 @@ htmlhelp_basename = project
 
 latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
-
     'papersize': 'letterpaper',
-
     # The font size ('10pt', '11pt' or '12pt').
-
     'pointsize': '10pt',
-
     # Additional stuff for the LaTeX preamble.
-
     'preamble': '',
-
     # Latex figure (float) alignment
-
     'figure_align': 'htbp',
 }
 
@@ -160,8 +152,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, f'{project}.tex', f'{project} Documentation',
-     author, 'manual'),
+    (master_doc, f'{project}.tex', f'{project} Documentation', author, 'manual'),
 ]
 
 
@@ -169,10 +160,7 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [
-    (master_doc, project, f'{project} Documentation',
-     [author], 1)
-]
+man_pages = [(master_doc, project, f'{project} Documentation', [author], 1)]
 
 
 # -- Options for Texinfo output ----------------------------------------------
@@ -181,9 +169,15 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, project, f'{project} Documentation',
-     author, project, description,
-     'Miscellaneous'),
+    (
+        master_doc,
+        project,
+        f'{project} Documentation',
+        author,
+        project,
+        description,
+        'Miscellaneous',
+    ),
 ]
 
 
@@ -223,17 +217,22 @@ intersphinx_mapping = {'https://docs.python.org/': None}
 #             }, True)
 #     app.add_transform(AutoStructify)
 
+
 def setup(app):
-    app.add_config_value('recommonmark_config', {
-        #'url_resolver': lambda url: github_doc_root + url,
-        'auto_toc_tree_section': 'Contents',
-        'auto_toc_maxdepth': 6,
-        'enable_auto_toc_tree': True,
-        'enable_math': False,
-        'enable_inline_math': False,
-        'enable_eval_rst': True,
-        # 'autosectionlabel_prefix_document': True,
-    }, True)
+    app.add_config_value(
+        'recommonmark_config',
+        {
+            #'url_resolver': lambda url: github_doc_root + url,
+            'auto_toc_tree_section': 'Contents',
+            'auto_toc_maxdepth': 6,
+            'enable_auto_toc_tree': True,
+            'enable_math': False,
+            'enable_inline_math': False,
+            'enable_eval_rst': True,
+            # 'autosectionlabel_prefix_document': True,
+        },
+        True,
+    )
     app.add_transform(AutoStructify)
 
 

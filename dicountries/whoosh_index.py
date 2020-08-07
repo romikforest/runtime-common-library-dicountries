@@ -11,30 +11,13 @@ from fuzzywuzzy import fuzz
 from unidecode import unidecode
 from whoosh import index
 from whoosh.analysis import StandardAnalyzer
-from whoosh.fields import (
-    STORED,
-    TEXT,
-    Schema
-)
-from whoosh.filedb.filestore import (
-    FileStorage,
-    RamStorage,
-    copy_storage
-)
-from whoosh.index import (
-    EmptyIndexError,
-    FileIndex
-)
-from whoosh.qparser import (
-    QueryParser,
-    syntax
-)
+from whoosh.fields import STORED, TEXT, Schema
+from whoosh.filedb.filestore import FileStorage, RamStorage, copy_storage
+from whoosh.index import EmptyIndexError, FileIndex
+from whoosh.qparser import QueryParser, syntax
 from whoosh.query import FuzzyTerm
 
-from .loader import (
-    create_basename_by_name_super_index,
-    load_post_process_country_mapping
-)
+from .loader import create_basename_by_name_super_index, load_post_process_country_mapping
 from .utils import reorder_name
 
 logger = logging.getLogger('dicountries')
@@ -110,19 +93,52 @@ class CountryIndex:  # pylint: disable=too-many-instance-attributes
             reinitialized.
     """
 
-    schema = Schema(decoded_country=TEXT(phrase=False,
-                                         analyzer=StandardAnalyzer(
-                                             stoplist=frozenset(
-                                                 ['and', 'is', 'it', 'an', 'as', 'at', 'have', 'in',
-                                                  'yet', 'if',
-                                                  'from', 'for', 'when', 'by', 'to', 'you', 'be',
-                                                  'we', 'that', 'may',
-                                                  'not', 'with', 'tbd', 'a', 'on', 'your', 'this',
-                                                  'of', 'will',
-                                                  'can', 'the', 'or', 'are']))),
-                    country=STORED(),
-                    basecountry=STORED(),
-                    )
+    schema = Schema(
+        decoded_country=TEXT(
+            phrase=False,
+            analyzer=StandardAnalyzer(
+                stoplist=frozenset(
+                    [
+                        'and',
+                        'is',
+                        'it',
+                        'an',
+                        'as',
+                        'at',
+                        'have',
+                        'in',
+                        'yet',
+                        'if',
+                        'from',
+                        'for',
+                        'when',
+                        'by',
+                        'to',
+                        'you',
+                        'be',
+                        'we',
+                        'that',
+                        'may',
+                        'not',
+                        'with',
+                        'tbd',
+                        'a',
+                        'on',
+                        'your',
+                        'this',
+                        'of',
+                        'will',
+                        'can',
+                        'the',
+                        'or',
+                        'are',
+                    ]
+                )
+            ),
+        ),
+        country=STORED(),
+        basecountry=STORED(),
+    )
     """whoosh search schema"""
 
     class CountryTermClass(FuzzyTerm):
@@ -137,13 +153,15 @@ class CountryIndex:  # pylint: disable=too-many-instance-attributes
                 constantscore (bool): use constant score
         """
 
-        def __init__(self,  # pylint: disable=too-many-arguments
-                     fieldname,
-                     text,
-                     boost=1.0,
-                     maxdist=2,
-                     prefixlength=0,
-                     constantscore=False):
+        def __init__(  # pylint: disable=too-many-arguments
+            self,
+            fieldname,
+            text,
+            boost=1.0,
+            maxdist=2,
+            prefixlength=0,
+            constantscore=False,
+        ):
             maxdist = 3
             if len(text) < 4:
                 maxdist = 0
@@ -154,8 +172,13 @@ class CountryIndex:  # pylint: disable=too-many-instance-attributes
 
             super().__init__(fieldname, text, boost, maxdist, prefixlength, constantscore)
 
-    def __init__(self, index_path=None, post_process_country_map=None, use_async=False,
-                 max_search_cache=DEFAULT_MAX_SEARCH_CACHE):
+    def __init__(
+        self,
+        index_path=None,
+        post_process_country_map=None,
+        use_async=False,
+        max_search_cache=DEFAULT_MAX_SEARCH_CACHE,
+    ):
         if post_process_country_map is None:
             self.post_process_country_map = load_post_process_country_mapping()
         else:
@@ -358,18 +381,25 @@ class CountryIndex:  # pylint: disable=too-many-instance-attributes
             q = qp.parse(query)
             results = s.search(q, limit=None)
             if not results:
-                qp = QueryParser('decoded_country', schema=self.schema,
-                                 termclass=self.CountryTermClass,
-                                 group=OrGroup)
+                qp = QueryParser(
+                    'decoded_country',
+                    schema=self.schema,
+                    termclass=self.CountryTermClass,
+                    group=OrGroup,
+                )
                 q = qp.parse(query)
                 results = s.search(q, limit=None)
-            results = [dict(basecountry=hit['basecountry'],
-                            country=hit['country'],
-                            # rate=hit.score,
-                            rate=fuzz.token_sort_ratio(
-                                _clean_name2(name),
-                                _clean_name2(hit['country']))  # rate=hit.score
-                            ) for hit in results]
+            results = [
+                dict(
+                    basecountry=hit['basecountry'],
+                    country=hit['country'],
+                    # rate=hit.score,
+                    rate=fuzz.token_sort_ratio(
+                        _clean_name2(name), _clean_name2(hit['country'])
+                    ),  # rate=hit.score
+                )
+                for hit in results
+            ]
             results = sorted(results, key=lambda k: k['rate'], reverse=True)
             results_len = len(results)
             try:

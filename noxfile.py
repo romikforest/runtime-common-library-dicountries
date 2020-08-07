@@ -88,6 +88,20 @@ def check_outdated(session, extras):
     standard_di_check_outdated(session, extras=extras, dilibraries=dilibraries)
 
 
+@nox.session(python=main_python, reuse_venv=True)
+def black(session):
+    """Format code with black (brunette)."""
+    session.log(f'Run isort for {lib_name}')
+    standard_di_black(session)
+
+
+@nox.session(python=main_python, reuse_venv=True)
+def black_check(session):
+    """Print code diffs for black (brunette) formatting."""
+    session.log(f'Run isort for {lib_name}')
+    standard_di_black_check(session)
+
+
 # @nox.session(python=main_python, reuse_venv=True)
 # @nox.parametrize('extras', [None])
 # def proselint(session, extras):

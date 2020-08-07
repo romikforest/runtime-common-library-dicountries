@@ -3,10 +3,7 @@
 import json
 from typing import List
 
-from .base_types import (
-    JSONType,
-    StringMap
-)
+from .base_types import JSONType, StringMap
 from .dict_index import (
     DictDB,
     Index,
@@ -15,7 +12,7 @@ from .dict_index import (
     create_dict_db,
     create_index,
     merge_indexes,
-    normalize_keys
+    normalize_keys,
 )
 
 
@@ -42,11 +39,7 @@ def get_json_data(file_name: str) -> JSONType:
 
 
 main_country_key_map: StringMap = dict(
-    alpha_2='a2',
-    alpha_3='a3',
-    numeric='num',
-    official_name='official',
-    common_name='common',
+    alpha_2='a2', alpha_3='a3', numeric='num', official_name='official', common_name='common',
 )
 """Mapping for main_country db field names
 {'common', 'name', 'a3', 'a2', 'num', 'official'}
@@ -58,10 +51,7 @@ country_region_key_map: StringMap = dict()
 """
 
 country_old_key_map: StringMap = dict(
-    alpha_2='a2',
-    alpha_3='a3',
-    alpha_4='a4',
-    numeric='num',
+    alpha_2='a2', alpha_3='a3', alpha_4='a4', numeric='num',
 )
 """Mapping for former countries db field names
 {'withdrawal_date', 'num', 'name', 'a2', 'comment', 'a4', 'a3'}
@@ -76,7 +66,8 @@ def load_main_country_db() -> DictDB:
 
     """
     return create_dict_db(
-        normalize_keys(get_json_data('iso3166-1.json')['3166-1'], main_country_key_map), 'a2')
+        normalize_keys(get_json_data('iso3166-1.json')['3166-1'], main_country_key_map), 'a2'
+    )
 
 
 def load_country_region_db() -> DictDB:
@@ -87,7 +78,8 @@ def load_country_region_db() -> DictDB:
 
     """
     country_region_db = create_dict_db(
-        normalize_keys(get_json_data('iso3166-2.json')['3166-2'], country_region_key_map), 'code')
+        normalize_keys(get_json_data('iso3166-2.json')['3166-2'], country_region_key_map), 'code'
+    )
     add_base_country(country_region_db, 'code', 'base')
     main_country_db = load_main_country_db()
     main_country_a3_by_a2_index = create_index(main_country_db, 'a3', 'a2')
@@ -107,7 +99,8 @@ def load_country_old_db() -> DictDB:
 
     """
     return create_dict_db(
-        normalize_keys(get_json_data('iso3166-3.json')['3166-3'], country_old_key_map), 'a3', True)
+        normalize_keys(get_json_data('iso3166-3.json')['3166-3'], country_old_key_map), 'a3', True
+    )
 
 
 def create_basename_by_name_super_index() -> Index:
@@ -124,22 +117,25 @@ def create_basename_by_name_super_index() -> Index:
 
     main_country_name_by_a3_index = create_index(main_country_db, 'name', 'a3')
 
-    country_region_base3_by_name_index = create_index(country_region_db, 'base3', 'name',
-                                                      policy='sort',
-                                                      remove_doubles=True)
-    country_region_basename_by_name_index = chain_indexes(country_region_base3_by_name_index,
-                                                          main_country_name_by_a3_index)
+    country_region_base3_by_name_index = create_index(
+        country_region_db, 'base3', 'name', policy='sort', remove_doubles=True
+    )
+    country_region_basename_by_name_index = chain_indexes(
+        country_region_base3_by_name_index, main_country_name_by_a3_index
+    )
 
-    main_country_a3_by_allname_index = create_index(main_country_db, 'a3',
-                                                    ['name', 'common', 'official'],
-                                                    policy='sort')
-    main_country_basename_by_name = chain_indexes(main_country_a3_by_allname_index,
-                                                  main_country_name_by_a3_index)
+    main_country_a3_by_allname_index = create_index(
+        main_country_db, 'a3', ['name', 'common', 'official'], policy='sort'
+    )
+    main_country_basename_by_name = chain_indexes(
+        main_country_a3_by_allname_index, main_country_name_by_a3_index
+    )
 
     country_old_name_by_a3_index = create_index(country_old_db, 'name', 'a3')
     country_old_a3_by_name_index = create_index(country_old_db, 'a3', 'name', policy='sort')
-    country_old_basename_by_name_index = chain_indexes(country_old_a3_by_name_index,
-                                                       country_old_name_by_a3_index)
+    country_old_basename_by_name_index = chain_indexes(
+        country_old_a3_by_name_index, country_old_name_by_a3_index
+    )
 
     index_list: List[Index] = []
     index_list.append(country_old_basename_by_name_index)
