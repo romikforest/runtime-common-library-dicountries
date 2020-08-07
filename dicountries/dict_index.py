@@ -23,15 +23,15 @@ from .base_types import (
 )
 from .utils import reorder_name
 
-try:
-    from typing import Final  # type: ignore # isort: ignore # pylint: disable=no-name-in-module
-except ImportError:
-    from typing_extensions import Final  # type: ignore # pylint: disable=no-name-in-module
+# try:
+#     from typing import Final  # type: ignore # isort: ignore # pylint: disable=no-name-in-module
+# except ImportError:
+#     from typing_extensions import Final  # type: ignore # pylint: disable=no-name-in-module
 
-REPORT_TEMPLATE_KEY_ADDED: Final = \
+REPORT_TEMPLATE_KEY_ADDED = \
     'Key has already been added to the index [%s] (Old: [%s], New: [%s])'
-REPORT_TEMPLATE_THERE_IS_FIELD: Final = 'There is a field [%s] in the index (%s)'
-REPORT_TEMPLATE_MERGE_WARNING: Final = \
+REPORT_TEMPLATE_THERE_IS_FIELD = 'There is a field [%s] in the index (%s)'
+REPORT_TEMPLATE_MERGE_WARNING = \
     'Index merge warning: key [%s] present in both ([%s, %s], [%s, %s])'
 REPORT_TEMPLATE_RECORDS_WITHOUT_FIELDS = \
     'There were records without filed [{%s}] in `add_base_country`'
