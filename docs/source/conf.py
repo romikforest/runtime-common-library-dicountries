@@ -23,7 +23,6 @@ sys.setrecursionlimit(1500)
 import recommonmark
 from recommonmark.transform import AutoStructify
 
-
 # -- Project information -----------------------------------------------------
 
 metadata_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))

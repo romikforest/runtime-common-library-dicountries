@@ -1,7 +1,10 @@
 from pathlib import Path
-from setuptools import setup, find_packages
 
 from dicountries import metadata
+from setuptools import (
+    find_packages,
+    setup
+)
 
 BUNDLES = {
 }

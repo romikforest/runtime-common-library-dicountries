@@ -14,7 +14,11 @@ import whoosh.automata.lev
 if not hasattr(whoosh.automata.lev, 'transposition_levenshtein_automaton'):
 
     def new_levenshtein_automaton(term, k, prefix=0):
-        from whoosh.automata.fsa import ANY, EPSILON, NFA
+        from whoosh.automata.fsa import (
+            ANY,
+            EPSILON,
+            NFA
+        )
         from whoosh.compat import xrange
 
         nfa = NFA((0, 0))

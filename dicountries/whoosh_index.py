@@ -11,10 +11,24 @@ from fuzzywuzzy import fuzz
 from unidecode import unidecode
 from whoosh import index
 from whoosh.analysis import StandardAnalyzer
-from whoosh.fields import STORED, TEXT, Schema
-from whoosh.filedb.filestore import FileStorage, RamStorage, copy_storage
-from whoosh.index import EmptyIndexError, FileIndex
-from whoosh.qparser import QueryParser, syntax
+from whoosh.fields import (
+    STORED,
+    TEXT,
+    Schema
+)
+from whoosh.filedb.filestore import (
+    FileStorage,
+    RamStorage,
+    copy_storage
+)
+from whoosh.index import (
+    EmptyIndexError,
+    FileIndex
+)
+from whoosh.qparser import (
+    QueryParser,
+    syntax
+)
 from whoosh.query import FuzzyTerm
 
 from .loader import (

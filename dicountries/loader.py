@@ -3,7 +3,10 @@
 import json
 from typing import List
 
-from .base_types import JSONType, StringMap
+from .base_types import (
+    JSONType,
+    StringMap
+)
 from .dict_index import (
     DictDB,
     Index,

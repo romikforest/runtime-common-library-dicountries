@@ -3,7 +3,13 @@
 # from typing import List, Dict, Union, Recursive
 # JSONType = Union[None, bool, float, str, List['JSONType'], Dict[str, 'JSONType']]
 
-from typing import Any, MutableMapping, MutableSequence, Sequence, Union
+from typing import (
+    Any,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+    Union
+)
 
 try:
     from typing import Literal  # type: ignore # pylint: disable=no-name-in-module

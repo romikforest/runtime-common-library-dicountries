@@ -4,7 +4,13 @@ Some operations on list and dict databases and indexes loaded from text and json
 
 import logging
 from copy import copy
-from typing import List, Set, Tuple, Union, cast
+from typing import (
+    List,
+    Set,
+    Tuple,
+    Union,
+    cast
+)
 
 from .base_types import (
     DictDB,
@@ -18,7 +24,7 @@ from .base_types import (
 from .utils import reorder_name
 
 try:
-    from typing import Final  # type: ignore # pylint: disable=no-name-in-module
+    from typing import Final  # type: ignore # isort: ignore # pylint: disable=no-name-in-module
 except ImportError:
     from typing_extensions import Final  # type: ignore # pylint: disable=no-name-in-module
 

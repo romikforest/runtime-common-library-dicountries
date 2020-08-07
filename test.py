@@ -1,7 +1,7 @@
-from dicountries.loader import create_basename_by_name_super_index
-from dicountries.whoosh_index import CountryIndex
 import subprocess
 
+from dicountries.loader import create_basename_by_name_super_index
+from dicountries.whoosh_index import CountryIndex
 
 #############################################################
 

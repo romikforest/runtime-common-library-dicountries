@@ -62,14 +62,14 @@ def bandit(session, extras):
 def isort_check(session):
     """Check code with isort"""
     session.log(f'Run isort_check for {lib_name}')
-    standard_di_isort_check(session, path=lib_name)
+    standard_di_isort_check(session)
 
 
 @nox.session(python=main_python, reuse_venv=True)
 def isort(session):
     """Sort imports with isort"""
     session.log(f'Run isort for {lib_name}')
-    standard_di_isort(session, path=lib_name)
+    standard_di_isort(session)
 
 
 @nox.session(python=main_python, reuse_venv=True)
