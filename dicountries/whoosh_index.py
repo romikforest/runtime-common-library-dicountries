@@ -1,4 +1,4 @@
-"""Whoosh based country search index"""
+"""Whoosh based country search index."""
 
 import asyncio
 import logging
@@ -48,7 +48,7 @@ OrGroup = syntax.OrGroup.factory(0.9)
 
 
 def _clean_name(name):
-    """Preprocess names before indexing
+    """Preprocess names before indexing.
 
     Args:
         name (str): name to preprocess
@@ -61,7 +61,7 @@ def _clean_name(name):
 
 
 def _clean_name2(name):
-    """Preprocess names before additional sorting
+    """Preprocess names before additional sorting.
 
     Args:
         name (str): name to preprocess
@@ -74,11 +74,11 @@ def _clean_name2(name):
 
 
 class CountryIndex:  # pylint: disable=too-many-instance-attributes
-    """
-    Country index class.
+    """Country index class.
+
     Can be used to index ISO and synonyms country databases and normalize/refine countries
     (to not use synonym country names or country names with typo in data analysis).
-    Indexing can be done simultaneously with country name normalizing
+    Indexing can be done simultaneously with country name normalizing.
 
     Args:
             index_path: path to save index. Default is f'indexes/countries_{COUNTRY_IX_VER}'.
@@ -126,7 +126,7 @@ class CountryIndex:  # pylint: disable=too-many-instance-attributes
     """whoosh search schema"""
 
     class CountryTermClass(FuzzyTerm):
-        """Class controls number of typo mistakes as dependency on the term length
+        """Class controls number of typo mistakes as dependency on the term length.
 
         Args:
                 fieldname: a name of the field the score will be calculated for
@@ -208,7 +208,7 @@ class CountryIndex:  # pylint: disable=too-many-instance-attributes
         return name
 
     def get_backup_path(self):
-        """Get backup path where index is saved on disk
+        """Get backup path where index is saved on disk.
 
         Returns:
             str: backup path
@@ -217,7 +217,7 @@ class CountryIndex:  # pylint: disable=too-many-instance-attributes
         return self.path
 
     def get_index(self):
-        """Get whoosh index (thread safe)
+        """Get whoosh index (thread safe).
 
         Returns:
             whoosh index
@@ -227,18 +227,17 @@ class CountryIndex:  # pylint: disable=too-many-instance-attributes
             return self.ix
 
     def create_whoosh_ram_index(self):
-        """Create inmemory whoosh index
+        """Create inmemory whoosh index.
 
         Returns:
             Empty inmemory whoosh index
 
         """
-
         storage = RamStorage()
         return FileIndex.create(storage, self.schema, 'MAIN')
 
     def backup_index(self):
-        """Backup whoosh index in on disk file"""
+        """Backup whoosh index in on disk file."""
         os.makedirs(self.path, exist_ok=True)
         with self.ix_lock:
             if self.ix:
@@ -289,7 +288,6 @@ class CountryIndex:  # pylint: disable=too-many-instance-attributes
             update_datetime (datetime): last refresh time to control if a new refresh is required
 
         """
-
         with self.update_lock:
             if update_datetime:
                 with self.last_update_lock:
@@ -328,7 +326,8 @@ class CountryIndex:  # pylint: disable=too-many-instance-attributes
 
     def normalize_country_detailed(self, name, limit=None):
         """Detailed country normalization.
-        Return whoosh index possible variants for the name and their rates
+
+        Returns whoosh index possible variants for the name and their rates.
 
         Args:
             name (str): country name to normalize
@@ -397,7 +396,6 @@ class CountryIndex:  # pylint: disable=too-many-instance-attributes
             str: normalized and possibly postprocessed country name
 
         """
-
         name = name.strip()
         with self.simple_index_lock:
             if self.simple_index:
@@ -433,13 +431,12 @@ class CountryIndex:  # pylint: disable=too-many-instance-attributes
             Only the variant with max rate will be returned.
 
             If `postprocess` is True additional name postprocessing will be done.
-            E.g. ISO name mapping to more desired by di team names
+            E.g. ISO name mapping to more desired by di team names.
 
         Args:
             name (str): Name to normalize and refine
 
         """
-
         name = self.normalize_country(name, postprocess=False)
         if name in self.post_process_country_map:
             return self.post_process_country_map[name]

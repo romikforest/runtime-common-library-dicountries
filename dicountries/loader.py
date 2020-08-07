@@ -1,4 +1,4 @@
-"""Loader for text and json databases"""
+"""Loader for text and json databases."""
 
 import json
 from typing import List
@@ -20,7 +20,7 @@ from .dict_index import (
 
 
 def get_json_data(file_name: str) -> JSONType:
-    """Load some json data saved with the package as string
+    """Load some json data saved with the package as string.
 
     Args:
         file_name: a path to json file
@@ -69,7 +69,7 @@ country_old_key_map: StringMap = dict(
 
 
 def load_main_country_db() -> DictDB:
-    """Load main country database (ISO3166-1)
+    """Load main country database (ISO3166-1).
 
     Returns:
         main country dict database
@@ -80,7 +80,7 @@ def load_main_country_db() -> DictDB:
 
 
 def load_country_region_db() -> DictDB:
-    """Load country region database (ISO3166-2)
+    """Load country region database (ISO3166-2).
 
     Returns:
         main country region dict database
@@ -100,7 +100,7 @@ def load_country_region_db() -> DictDB:
 
 
 def load_country_old_db() -> DictDB:
-    """Load former country database (ISO3166-3)
+    """Load former country database (ISO3166-3).
 
     Returns:
         former country dict database
@@ -111,7 +111,7 @@ def load_country_old_db() -> DictDB:
 
 
 def create_basename_by_name_super_index() -> Index:
-    """Process ISO and synonyms database to have a basename by name index
+    """Process ISO and synonyms database to have a basename by name index.
 
     Returns:
         combined country (main, region, former), synonym index
@@ -159,8 +159,10 @@ def create_basename_by_name_super_index() -> Index:
 
 
 def load_post_process_country_mapping() -> StringMap:
-    """Load di post process index that can be used to correct some ugly ISO names
-    to desired names the di teem likes more
+    """Load post process index.
+
+    Load di post process index that can be used to correct some ugly ISO names
+    to desired names the di teem likes more.
 
     Returns:
         country name mapping (dict)
@@ -170,7 +172,7 @@ def load_post_process_country_mapping() -> StringMap:
 
 
 def save_index(index: Index, path: str) -> None:
-    """Save index to a file
+    """Save index to a file.
 
     Args:
         index: dict index
@@ -182,7 +184,7 @@ def save_index(index: Index, path: str) -> None:
 
 
 def restore_index(path: str) -> Index:
-    """Load index from file
+    """Load index from file.
 
     Args:
         path: path to load index from

@@ -1,8 +1,8 @@
-"""Some useful utils used by other modules"""
+"""Some useful utils used by other modules."""
 
 
 def get_main_code(code: str) -> str:
-    """Get code of the main country
+    """Get code of the main country.
 
     Args:
         code (str): a dash delimited country code and region code
@@ -18,7 +18,7 @@ def get_main_code(code: str) -> str:
 
 
 def reorder_name(name: str) -> str:
-    """Reorder `name` splitting by comma
+    """Reorder `name` splitting by comma.
 
     Args:
         name (str): name possible containing comma

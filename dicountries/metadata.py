@@ -1,4 +1,4 @@
-"""package metadata aggregation"""
+"""Package metadata aggregation."""
 import os
 
 # pylint: disable=invalid-name

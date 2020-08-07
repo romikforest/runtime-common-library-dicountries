@@ -1,6 +1,4 @@
-"""
-Some operations on list and dict databases and indexes loaded from text and json files
-"""
+"""Some operations on list and dict databases and indexes loaded from text and json files."""
 
 import logging
 from copy import copy
@@ -43,7 +41,7 @@ logging.basicConfig(format='%(levelname)s  dicountries: %(message)s')
 
 
 def get_keys(db: SimpleDB) -> Set[str]:
-    """Get unique keys from a list-like or dict like database
+    """Get unique keys from a list-like or dict like database.
 
     Args:
         db: database
@@ -67,8 +65,10 @@ def get_keys(db: SimpleDB) -> Set[str]:
 
 
 def normalize_keys(db: ListDB, key_mapping: StringMap) -> ListDB:
-    """Create a new list database on base of `db` list database transforming keys
-    accordingly to the `key_mapping` mapping
+    """Normalize database keys.
+
+    Create a new list database on base of `db` list database transforming keys
+    accordingly to the `key_mapping` mapping.
 
     Args:
         db: incoming list database
@@ -89,7 +89,7 @@ def normalize_keys(db: ListDB, key_mapping: StringMap) -> ListDB:
 
 
 def create_dict_db(db: ListDB, field_name: str, allow_doubles: bool = False) -> DictDB:
-    """Transform a list country database to a dict country database
+    """Transform a list country database to a dict country database.
 
     Args:
         db: incoming list database
@@ -104,7 +104,6 @@ def create_dict_db(db: ListDB, field_name: str, allow_doubles: bool = False) -> 
         RuntimeError: If key has already been added to the index and `allow_doubles` is False
 
     """
-
     new_db: DictDB = {}
     for item in db:
         key = item[field_name]
@@ -121,7 +120,7 @@ def create_dict_db(db: ListDB, field_name: str, allow_doubles: bool = False) -> 
 def create_index(db: SimpleDB, first_field: str, second_fields: FieldsDescription,  # noqa: C901
                  policy: SplitPolicies = 'None',
                  remove_doubles: bool = False) -> Index:
-    """Create a new dict index for list-like or dict-like database db
+    """Create a new dict index for list-like or dict-like database db.
 
     Args:
         db: database
@@ -205,7 +204,7 @@ def create_index(db: SimpleDB, first_field: str, second_fields: FieldsDescriptio
 
 
 def print_index(index: Index) -> None:
-    """Print index content
+    """Print index content.
 
     Args:
         index: dict index to print to stdout
@@ -216,7 +215,7 @@ def print_index(index: Index) -> None:
 
 
 def print_names_with_comma(index: Index, policy: SplitPolicies = 'None') -> None:
-    """Print names with commas in the index keys:
+    """Print names with commas in the index keys.
 
     Args:
         index: a dict index to print keys with coma
@@ -238,7 +237,7 @@ def print_names_with_comma(index: Index, policy: SplitPolicies = 'None') -> None
 
 
 def merge_indexes(*indexes: Union[Index, List[Index]]) -> Index:
-    """Create a new combined index from several indexes (combine key-value pairs from all of them)
+    """Create a new combined index from several indexes (combine key-value pairs from all of them).
 
     Args:
         indexes: several indexes as separate parameters or a list of indexes (one parameter)
@@ -260,9 +259,11 @@ def merge_indexes(*indexes: Union[Index, List[Index]]) -> Index:
 
 
 def chain_indexes(*indexes: Union[Index, List[Index]]) -> Index:
-    """Create a new combined index from several indexes applying indexation sequentially
+    """Chain several indexes.
+
+    Create a new combined index from several indexes applying indexation sequentially
     to every index in the list
-    (keys from the first one and corresponding values from the last one)
+    (keys from the first one and corresponding values from the last one).
 
     Args:
         indexes: several indexes as separate parameters or a list of indexes (one parameter)
@@ -285,7 +286,7 @@ def chain_indexes(*indexes: Union[Index, List[Index]]) -> Index:
 
 
 def reverse_index(index: Index) -> Index:
-    """Reverse an index (keys become values and values became keys)
+    """Reverse an index (keys become values and values became keys).
 
     Args:
         index: a dict index
@@ -298,17 +299,19 @@ def reverse_index(index: Index) -> Index:
 
 
 def add_base_country(db: SimpleDB, source_field: str, dest_field: str) -> None:
-    """Add a field with base country part using `dest_field` description
-    for the list-like or dict like database `db` records
+    """Add base country field to database.
+
+    Add a field with base country part using `dest_field` description
+    for the list-like or dict like database `db` records.
 
     Args:
         db: processed database
         source_field: a field to be splitted to base country and region name
         dest_field: a field name to save the base country information.
 
-         Example:
-             If some `source_field` has value "GT-SO" then
-             value "GT" will be saved as the value of the `dest_field`
+    Example:
+        If some `source_field` has value "GT-SO" then
+        value "GT" will be saved as the value of the `dest_field`.
 
     """
     no_source: bool = False

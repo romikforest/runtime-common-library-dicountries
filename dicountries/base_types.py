@@ -1,4 +1,4 @@
-"""Base type hints, used by dicountries library"""
+"""Base type hints, used by dicountries library."""
 
 # from typing import List, Dict, Union, Recursive
 # JSONType = Union[None, bool, float, str, List['JSONType'], Dict[str, 'JSONType']]
