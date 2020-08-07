@@ -55,7 +55,7 @@ def pylint(session, extras):
 def bandit(session, extras):
     """Check code with bandit"""
     session.log(f'Run bandit for {lib_name}')
-    standard_di_bandit(session, dilibraries=dilibraries)
+    standard_di_bandit(session, extras=extras, dilibraries=dilibraries)
 
 
 @nox.session(python=main_python, reuse_venv=True)
