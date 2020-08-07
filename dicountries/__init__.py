@@ -4,6 +4,8 @@ To prevent typo errors and using country name synonyms during data analysis.
 Normalization is based on ISO3166 database and country name synonyms from Wikipedia
 """
 
+# flake8: noqa: F401, F403
+
 from .metadata import version as __version__
 
 

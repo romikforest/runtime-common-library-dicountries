@@ -2,6 +2,7 @@
 
 # pylint: disable=too-many-lines
 # pylint: disable=wrong-import-position
+# flake8: noqa: E402
 
 # 'Åland' = 'Aaland Islands'
 # 'Bosnia And Herzegowina' = 'Bosnia and Herzigowina'

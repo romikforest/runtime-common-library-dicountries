@@ -1,4 +1,5 @@
 """This is a helper file. It generates the data/post_process_country_mapping.json file"""
+# flake8: noqa: E402
 
 from typing import Dict
 

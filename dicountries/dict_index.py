@@ -118,7 +118,7 @@ def create_dict_db(db: ListDB, field_name: str, allow_doubles: bool = False) -> 
     return new_db
 
 
-def create_index(db: SimpleDB, first_field: str, second_fields: FieldsDescription,
+def create_index(db: SimpleDB, first_field: str, second_fields: FieldsDescription,  # noqa: C901
                  policy: SplitPolicies = 'None',
                  remove_doubles: bool = False) -> Index:
     """Create a new dict index for list-like or dict-like database db

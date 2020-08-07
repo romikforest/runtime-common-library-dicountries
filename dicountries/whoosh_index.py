@@ -369,8 +369,7 @@ class CountryIndex:  # pylint: disable=too-many-instance-attributes
                             # rate=hit.score,
                             rate=fuzz.token_sort_ratio(
                                 _clean_name2(name),
-                                _clean_name2(hit['country'])
-                            )  # rate=hit.score
+                                _clean_name2(hit['country']))  # rate=hit.score
                             ) for hit in results]
             results = sorted(results, key=lambda k: k['rate'], reverse=True)
             results_len = len(results)

@@ -8,6 +8,7 @@ Note:
 """
 
 # pylint: skip-file
+# flake8: noqa: C901
 
 import whoosh.automata.lev
 
@@ -54,7 +55,6 @@ if not hasattr(whoosh.automata.lev, 'transposition_levenshtein_automaton'):
                 nfa.add_transition((len(term), e), ANY, (len(term), e + 1))
             nfa.add_final_state((len(term), e))
         return nfa
-
 
     whoosh.automata.lev.origin_levenshtein_automaton = whoosh.automata.lev.levenshtein_automaton
     whoosh.automata.lev.levenshtein_automaton = new_levenshtein_automaton

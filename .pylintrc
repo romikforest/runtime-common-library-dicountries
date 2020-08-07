@@ -1,0 +1,8 @@
+[MASTER]
+ignore=.nox
+
+[BASIC]
+good-names=i,j,k,ex,Run,_,f,v,db,x,y,z,ix,e,d,s,q,qp,t,n,m,r,u,p,h,c
+
+[FORMAT]
+max-line-length=100
