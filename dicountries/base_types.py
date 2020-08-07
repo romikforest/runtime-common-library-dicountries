@@ -6,11 +6,9 @@
 from typing import Any, MutableMapping, MutableSequence, Sequence, Union
 
 try:
-    from typing import \
-        Literal  # type: ignore # pylint: disable=no-name-in-module
+    from typing import Literal  # type: ignore # pylint: disable=no-name-in-module
 except ImportError:
-    from typing_extensions import \
-        Literal  # type: ignore # pylint: disable=no-name-in-module
+    from typing_extensions import Literal  # type: ignore # pylint: disable=no-name-in-module
 
 JSONType = Any
 """Type hint for json objects"""

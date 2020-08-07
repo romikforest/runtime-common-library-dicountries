@@ -18,11 +18,9 @@ from .base_types import (
 from .utils import reorder_name
 
 try:
-    from typing import \
-        Final  # type: ignore # pylint: disable=no-name-in-module
+    from typing import Final  # type: ignore # pylint: disable=no-name-in-module
 except ImportError:
-    from typing_extensions import \
-        Final  # type: ignore # pylint: disable=no-name-in-module
+    from typing_extensions import Final  # type: ignore # pylint: disable=no-name-in-module
 
 REPORT_TEMPLATE_KEY_ADDED: Final = \
     'Key has already been added to the index [%s] (Old: [%s], New: [%s])'
@@ -33,7 +31,6 @@ REPORT_TEMPLATE_RECORDS_WITHOUT_FIELDS = \
     'There were records without filed [{%s}] in `add_base_country`'
 REPORT_TEMPLATE_RECORDS_WITHOUT_DASH = \
     'There were records without dash in the filed [{%s}] in `add_base_country`'
-
 
 logger = logging.getLogger('dicountries')
 logging.basicConfig(format='%(levelname)s  dicountries: %(message)s')

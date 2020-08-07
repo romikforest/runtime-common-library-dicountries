@@ -77,7 +77,7 @@ def isort(session):
 def mypy(session, extras):
     """Check code with mypy"""
     session.log(f'Run mypy for {lib_name}')
-    standard_di_mypy(session, path=lib_name, extras=extras, dilibraries=dilibraries)
+    standard_di_mypy(session, extras=extras, dilibraries=dilibraries)
 
 # @nox.session(python=main_python, reuse_venv=True)
 # @nox.parametrize('extras', [None])
