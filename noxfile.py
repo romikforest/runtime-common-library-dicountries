@@ -79,6 +79,15 @@ def mypy(session, extras):
     session.log(f'Run mypy for {lib_name}')
     standard_di_mypy(session, extras=extras, dilibraries=dilibraries)
 
+
+@nox.session(python=main_python, reuse_venv=True)
+@nox.parametrize('extras', [None])
+def check_outdated(session, extras):
+    """Check for outdated packages"""
+    session.log(f'Run check_outdated for {lib_name}')
+    standard_di_check_outdated(session, extras=extras, dilibraries=dilibraries)
+
+
 # @nox.session(python=main_python, reuse_venv=True)
 # @nox.parametrize('extras', [None])
 # def proselint(session, extras):

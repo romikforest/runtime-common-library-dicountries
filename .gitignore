@@ -2,6 +2,7 @@
 /indexes/
 corrector.py
 mypy_coverage
+code_coverage
 
 .DS_Store
 thumbs.db
