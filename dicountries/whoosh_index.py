@@ -23,8 +23,9 @@ from .utils import reorder_name
 logger = logging.getLogger('dicountries')
 logging.basicConfig(format='%(levelname)s  dicountries: %(message)s')
 
-COUNTRY_IX_VER = 1  # change this if you've changed the index schema
-                    # , so old index will not be loaded in the Kubernetes pod
+COUNTRY_IX_VER = 1  # change this if you've changed the index schema,
+# so old index will not be loaded in the Kubernetes pod
+
 DEFAULT_MAX_SEARCH_CACHE = 1000  # Max size of the country cache.
 
 OrGroup = syntax.OrGroup.factory(0.9)
