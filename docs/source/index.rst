@@ -11,11 +11,13 @@
 
 .. toctree::
     :maxdepth: 3
+    :caption: Intro
 
     intro
 
 .. toctree::
     :maxdepth: 3
+    :caption: Reference
 
     reference/index
 

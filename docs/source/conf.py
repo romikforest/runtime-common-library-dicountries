@@ -64,6 +64,8 @@ extensions = [
     'recommonmark',
     'sphinx.ext.autosectionlabel',
     'sphinx_autodoc_typehints',
+    'sphinx_markdown_tables',
+    'sphinx_rtd_theme',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -104,7 +106,7 @@ pygments_style = 'sphinx'
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'alabaster'
+html_theme = 'sphinx_rtd_theme'
 html_logo = 'images/logo.svg'
 
 # Theme options are theme-specific and customize the look and feel of a theme
@@ -117,6 +119,10 @@ html_logo = 'images/logo.svg'
 # relative to this directory. They're copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+# html_css_files = [
+#     'css/custom.css',
+# ]
+html_style = 'css/ditheme.css'
 
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.
