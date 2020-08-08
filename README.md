@@ -66,8 +66,8 @@ The function `normalize_country` returns a normalized country name if possible
 (looking in country indexes and using fuzzy search),
 otherwise it returns the country name from the incoming parameter.
 
-This function will try to return the country name accordingly to the ISO 3166 standard.
-But if a substitution for this name is determined in the file
+This function will try to return the country name accordingly to the ISO 3166
+standard, but if a substitution for this name is determined in the file
 `post_process_country_mapping.json` in the package's data directory that
 substitution will be returned.
 
@@ -79,10 +79,10 @@ print(country_index.normalize_country('Россия', postprocess=False))
 
 ```
 
-The function `refine_country` will return the same value as the `normalize_country`,
-but if there is a comma \[,\] in the returned name it will recombine the name so that
-the part after the comma will precede the part before the comma. The comma will be
-deleted.
+The function `refine_country` will return the same value as the
+`normalize_country`, but if there is a comma \[,\] in the returned name it will
+recombine the name so that the part after the comma will precede the part before
+the comma. The comma will be deleted.
 
 You can also do this transformation on any string using function `reorder_name(name)`
 from the `dicountries.utils` module.
@@ -123,8 +123,7 @@ country_index = CountryIndex(max_search_cache=1000)
 During the normalization the search process usually checks the cache first. If some
 country is not found in the cache more complicated techniques will be used.
 Every found country is placed to the simple cache, but if the cache riches
-`max_search_cache` size it will be reinitialized and the search process will start
-from scratch.
+`max_search_cache` size it will be cleared and the search process will be reinitialized.
 
 
 

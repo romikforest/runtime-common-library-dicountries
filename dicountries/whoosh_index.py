@@ -360,7 +360,7 @@ class CountryIndex:  # pylint: disable=too-many-instance-attributes
             RuntimeError: if it is called during the reindexation process
 
         Note:
-            The result scoring can be very bad if the `limit` value differ from `None`
+            The result scoring can be bad if the `limit` value differ from `None`
 
         """
         cur_ix = self.get_index()

@@ -1,7 +1,6 @@
 # flake8: noqa
 
 import dinoxhelper
-# from configparser import ConfigParser
 
 lib_name = 'dicountries'
 
@@ -105,12 +104,8 @@ def black_check(session):
     standard_di_black_check(session)
 
 
-# @nox.session(python=main_python, reuse_venv=True)
-# @nox.parametrize('extras', [None])
-# def proselint(session, extras):
-#     """Check code with proselint"""
-#     session.log(f'Run proselint for {lib_name}')
-#     common_setup(session, extras=extras, dilibraries=dilibraries)
-#     from pathlib import Path
-#     for path in Path('.').rglob('*.rst'):
-#         session.run('python', '-m', 'proselint', str(path))
+@nox.session(python=main_python, reuse_venv=True)
+def proselint(session):
+    """Check code with proselint"""
+    session.log(f'Run proselint for {lib_name}')
+    standard_di_proselint(session)
