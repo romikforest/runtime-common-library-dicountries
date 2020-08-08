@@ -1,3 +1,5 @@
+# flake8: noqa
+
 import subprocess
 
 from dicountries.loader import create_basename_by_name_super_index

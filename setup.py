@@ -1,3 +1,5 @@
+# flake8: noqa
+
 from pathlib import Path
 
 from dicountries import metadata
@@ -49,6 +51,6 @@ setup(
     install_requires=reqs('default.txt'),
     extras_require=extras_require(),
     long_description=open('README.md').read(),
-    package_data={'dicountries': ['data/*'],},
+    package_data={'dicountries': ['data/*']},
     zip_safe=False,
 )

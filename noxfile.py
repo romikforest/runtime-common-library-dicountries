@@ -1,3 +1,4 @@
+# flake8: noqa
 import dinoxhelper
 
 lib_name = 'dicountries'
@@ -39,7 +40,7 @@ def build_library(session):
 def flake8(session, extras):
     """Check code with flake8"""
     session.log(f'Run flake8 for {lib_name}')
-    standard_di_flake8(session, path=lib_name, dilibraries=dilibraries)
+    standard_di_flake8(session, extras=extras, dilibraries=dilibraries)
 
 
 @nox.session(python=main_python, reuse_venv=True)
@@ -108,7 +109,6 @@ def black_check(session):
 #     """Check code with proselint"""
 #     session.log(f'Run proselint for {lib_name}')
 #     common_setup(session, extras=extras, dilibraries=dilibraries)
-#     session.install('proselint')
 #     from pathlib import Path
 #     for path in Path('.').rglob('*.rst'):
 #         session.run('python', '-m', 'proselint', str(path))
