@@ -1,5 +1,7 @@
 # flake8: noqa
+
 import dinoxhelper
+# from configparser import ConfigParser
 
 lib_name = 'dicountries'
 
@@ -48,7 +50,7 @@ def flake8(session, extras):
 def pylint(session, extras):
     """Check code with pylint"""
     session.log(f'Run pylint for {lib_name}')
-    standard_di_pylint(session, path=lib_name, dilibraries=dilibraries)
+    standard_di_pylint(session, extras=extras, dilibraries=dilibraries)
 
 
 @nox.session(python=main_python, reuse_venv=True)
