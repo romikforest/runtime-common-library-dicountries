@@ -24,7 +24,7 @@ logger = logging.getLogger('dicountries')
 logging.basicConfig(format='%(levelname)s  dicountries: %(message)s')
 
 COUNTRY_IX_VER = 1  # change this if you've changed the index schema
-# , so old index will not be loaded in the k8s pod
+                    # , so old index will not be loaded in the Kubernetes pod
 DEFAULT_MAX_SEARCH_CACHE = 1000  # Max size of the country cache.
 
 OrGroup = syntax.OrGroup.factory(0.9)
@@ -68,8 +68,8 @@ class CountryIndex:  # pylint: disable=too-many-instance-attributes
                 Is used to load index on startup which is saved every time it is rebuilt.
                 The inmemory copy of the index is used for normalizing and refining.
                 The on disk index allows to start normalize names immediately on
-                application startup. If index exists it will be rebuilt by
-                calling `refresh` method explicitly
+                app startup. If index exists it will be rebuilt by
+                calling the `refresh` method explicitly
             post_process_country_map: a map to postprocess normalized names (None or empty map
                 if no postprocessing required)
             use_async (bool): use asyncio and threads to search and index simultaneously

@@ -1,8 +1,9 @@
 /dicountries/indexes/
 /indexes/
 corrector.py
-mypy_coverage
-code_coverage
+mypy_coverage/
+code_coverage/
+vale/
 
 .DS_Store
 thumbs.db

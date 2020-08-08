@@ -109,3 +109,16 @@ def proselint(session):
     """Check code with proselint"""
     session.log(f'Run proselint for {lib_name}')
     standard_di_proselint(session)
+
+
+@nox.session(python=main_python, reuse_venv=True)
+def vale(session):
+    """Check code with vale."""
+
+    session.log(f'Run vale for {lib_name}')
+    standard_di_vale(session)
+
+
+
+
+

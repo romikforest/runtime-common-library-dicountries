@@ -14,8 +14,8 @@ Country name normalization for DataIntelligence project
 
 To use the module from this repository you need to have a working [python](https://www.python.org/)
 installation (version >= 3.6.0) with pre-installed [pip](https://pypi.org/project/pip/) package installer.
-I suppose you can run the python and pip executables using `python` and `pip` commands. Depending on
-your setup you may have to run them like `python3` and `pip3` or using other aliases. The recommended
+You can run the python and pip executables using `python` and `pip` commands, or, depending on
+your setup, you may have to run them like `python3` and `pip3` or using other aliases. The recommended
 way to install these scripts is to execute commands like:
 
 ```shell script
@@ -23,8 +23,8 @@ python -m install -U pip
 python -m install -U dicountries 
 ```
 
-In order to access the azure artifact feed you need to set up your pip to use appropriate indices.
-E.g. you can set `PIP_EXTRA_INDEX_URL` environment variable like:
+To access the azure artifact feed you need to set up your pip to use appropriate indices.
+For example you can set `PIP_EXTRA_INDEX_URL` environment variable like:
 
 ```shell script
 export PIP_EXTRA_INDEX_URL="https://di_libraries:<access token>@pkgs.dev.azure.com/swodataintelligence/71b5c973-6f2c-42b7-a0a9-8af59f1bf7ee/_packaging/di_libraries_test/pypi/simple/"
@@ -102,7 +102,7 @@ just ommit the line:
 country_index.refresh()
 ```
 
-Without this line the index will be rebuilt only if it does not exist, otherwise
+Without this line the index will be rebuilt only if it doesn't exist, otherwise
 it will be read from the index directory (it's faster).
 
 If you want the index to be updated as a background process or you want to have
@@ -121,7 +121,7 @@ country_index = CountryIndex(max_search_cache=1000)
 ```
 
 During the normalization the search process usually checks the cache first. If some
-country is not found in the cache more complicated techniques will be used.
+country isn't found in the cache more complicated techniques will be used.
 Every found country is placed to the simple cache, but if the cache riches
 `max_search_cache` size it will be cleared and the search process will be reinitialized.
 
