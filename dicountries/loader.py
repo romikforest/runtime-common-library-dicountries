@@ -161,7 +161,7 @@ def load_post_process_country_mapping() -> StringMap:
     to desired names the di teem likes more.
 
     Returns:
-        country name mapping (dict)
+        country name mapping
 
     """
     return get_json_data('post_process_country_mapping.json')

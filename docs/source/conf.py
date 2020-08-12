@@ -16,20 +16,29 @@ import importlib
 import os
 import sys
 
-source_folder = 'dicountries'
+from configparser import ConfigParser
+
+from recommonmark.transform import AutoStructify
+
 sys.path.insert(0, os.path.abspath('../..'))
 sys.setrecursionlimit(1500)
 
-import recommonmark
-from recommonmark.transform import AutoStructify
+config = ConfigParser()
+config.read('../../setup.cfg')
+if 'docs' in config:
+    config = config['docs']
+else:
+    config = {}
+
 
 # -- Project information -----------------------------------------------------
 
-metadata_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-metadata_path = os.path.join(metadata_path, f'{source_folder}/metadata.py')
-spec = importlib.util.spec_from_file_location('metadata', metadata_path)
-metadata = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(metadata)
+setup_module_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+setup_module_path = os.path.join(setup_module_path, 'setup.py')
+spec = importlib.util.spec_from_file_location('setup', setup_module_path)
+setup_module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(setup_module)
+metadata = setup_module.metadata
 
 project = metadata.name
 copyright = metadata.lib_copyright
@@ -53,19 +62,26 @@ release = metadata.version
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    'sphinx.ext.todo',
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
     'sphinx.ext.ifconfig',
     'sphinx.ext.viewcode',
-    'sphinx.ext.githubpages',
+    'sphinx.ext.graphviz',
     'rinoh.frontend.sphinx',
     'sphinx.ext.napoleon',
     'sphinx.ext.mathjax',
     'recommonmark',
     'sphinx.ext.autosectionlabel',
+    'sphinx.ext.autosummary',
     'sphinx_autodoc_typehints',
     'sphinx_markdown_tables',
     'sphinx_rtd_theme',
+    'sphinx.ext.coverage',
+    'sphinx.ext.doctest',
+    'sphinx.ext.extlinks',
+    # 'autoapi.extension',
+    'sphinx.ext.inheritance_diagram',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -98,7 +114,7 @@ language = None
 exclude_patterns = []
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
+pygments_style = 'default'
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -107,7 +123,9 @@ pygments_style = 'sphinx'
 # a list of builtin themes.
 #
 html_theme = 'sphinx_rtd_theme'
-html_logo = 'images/logo.svg'
+html_logo = '_static/images/logo.svg'
+html_favicon = '_static/images/favicon.ico'
+html_show_sphinx = False
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -142,23 +160,28 @@ htmlhelp_basename = project
 
 
 # -- Options for LaTeX output ------------------------------------------------
+latex_engine = 'xelatex'
 
 latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
-    'papersize': 'letterpaper',
+    'papersize': 'a4paper',
     # The font size ('10pt', '11pt' or '12pt').
     'pointsize': '10pt',
     # Additional stuff for the LaTeX preamble.
-    'preamble': '',
+    'preamble': r'\usepackage{unicode-math}',
     # Latex figure (float) alignment
     'figure_align': 'htbp',
 }
+
+latex_logo = '_static/images/logo.png'
+latex_show_urls = 'inline'
+latex_domain_indices = True
 
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, f'{project}.tex', f'{project} Documentation', author, 'manual'),
+    (master_doc, f'{project}.tex', f'{project} Documentation', f'{copyright}\n{author}', 'manual'),
 ]
 
 
@@ -166,7 +189,7 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [(master_doc, project, f'{project} Documentation', [author], 1)]
+man_pages = [(master_doc, project, f'{project} Documentation', [f'{copyright}\n{author}'], 1)]
 
 
 # -- Options for Texinfo output ----------------------------------------------
@@ -179,7 +202,7 @@ texinfo_documents = [
         master_doc,
         project,
         f'{project} Documentation',
-        author,
+        f'{copyright}\n{author}',
         project,
         description,
         'Miscellaneous',
@@ -208,12 +231,19 @@ epub_copyright = copyright
 epub_exclude_files = ['search.html']
 
 
+
 # -- Extension configuration -------------------------------------------------
 
 # -- Options for intersphinx extension ---------------------------------------
 
 # Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'https://docs.python.org/': None}
+intersphinx_mapping = {
+    'https://docs.python.org/': None,
+    'https://mypy.readthedocs.io/en/latest/': None,
+    'https://whoosh.readthedocs.io/en/latest/': None,
+    'https://pytest.readthedocs.io/en/latest/': None,
+    'http://pytz.sourceforge.net/': None,
+}
 
 # app setup hook
 # def setup(app):
@@ -241,5 +271,85 @@ def setup(app):
     )
     app.add_transform(AutoStructify)
 
+show_authors = True
 
+# autodoc:
+# autodoc_mock_imports = []
+# autodoc_default_options = {
+#     'members': True,
+#     'member-order': 'bysource',
+#     'private-members': True,
+#     'special-members': True,
+#     'undoc-members': True,
+#     # 'inherited-members': True,
+#     'show-inheritance': True,
+#     # 'imported-members': True,
+#     'ignore-module-all': True,
+#     'exclude-members': '__init__',
+# }
+
+# autosectionlabel:
 autosectionlabel_prefix_document = True
+
+# autosummary:
+autosummary_generate = True
+# autosummary_imported_members = True
+
+# napoleon:
+# napoleon_google_docstring = True
+# napoleon_numpy_docstring = True
+# napoleon_include_init_with_doc = False
+# napoleon_include_private_with_doc = False
+# napoleon_include_special_with_doc = True
+# napoleon_use_admonition_for_examples = False
+# napoleon_use_admonition_for_notes = False
+# napoleon_use_admonition_for_references = False
+# napoleon_use_ivar = False
+# napoleon_use_param = True
+# napoleon_use_rtype = True
+# napoleon_type_aliases = None
+
+# sphinx-autodoc-typehints:
+set_type_checking_flag = True
+typehints_fully_qualified = True
+always_document_param_types = True
+typehints_document_rtype = True
+
+# sphinx.ext.todo
+todo_include_todos=True
+
+# intersphinx
+# extra_intersphinx_mapping={
+#     'mypy': ('https://mypy.readthedocs.io/en/latest/', None),
+#     'pytest': ('https://pytest.readthedocs.io/en/latest/', None),
+#     'python': ('https://docs.python.org/3', None),
+#     'whoosh': ('https://whoosh.readthedocs.io/en/latest/', None),
+# }
+
+# extlinks
+# extlinks = {'issue': ('https://github.com/sphinx-doc/sphinx/issues/%s',
+#                       'issue ')}
+
+# autoapi
+#--------------------------
+# autoapi is good to automatically document python, js, net, go code but...
+# no links for terms, no typehints, sphinx_autodoc_typehints won't work with it.
+# So I switch to use autosummary
+# To use autoapi the settings bellow and in index.rst:
+#
+# .. toctree::
+#     :maxdepth: 3
+#     :caption: References
+#     :glob:
+#
+#     autoapi/*
+
+# autoapi_dirs = config.get('autoapi_dirs')
+# if autoapi_dirs:
+#     autoapi_dirs = set(autoapi_dirs.split(','))
+# else:
+#     autoapi_dirs = set()
+# autoapi_dirs = [f'../../{x}' for x in autoapi_dirs]
+# autoapi_type = 'python'
+# autoapi_template_dir = '_templates/_autoapi'
+

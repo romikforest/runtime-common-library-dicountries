@@ -1,0 +1,3 @@
+# (generated with --quick)
+
+def test_generic() -> None: ...

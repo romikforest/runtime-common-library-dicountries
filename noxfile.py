@@ -31,7 +31,7 @@ def install_dev(session):
 
 @nox.session(python=main_python)
 def build_library(session):
-    """Build library package. (Add version file manually.)"""
+    """Build library package (Add version file manually)."""
     session.log(f'Run build_library in {lib_name}')
     standard_build_di_library(session, dilibraries=dilibraries)
 
@@ -39,7 +39,7 @@ def build_library(session):
 @nox.session(python=main_python, reuse_venv=True)
 @nox.parametrize('extras', [None])
 def flake8(session, extras):
-    """Check code with flake8"""
+    """Check code with flake8."""
     session.log(f'Run flake8 for {lib_name}')
     standard_di_flake8(session, extras=extras, dilibraries=dilibraries)
 
@@ -47,7 +47,7 @@ def flake8(session, extras):
 @nox.session(python=main_python, reuse_venv=True)
 @nox.parametrize('extras', [None])
 def pylint(session, extras):
-    """Check code with pylint"""
+    """Check code with pylint."""
     session.log(f'Run pylint for {lib_name}')
     standard_di_pylint(session, extras=extras, dilibraries=dilibraries)
 
@@ -55,21 +55,21 @@ def pylint(session, extras):
 @nox.session(python=main_python, reuse_venv=True)
 @nox.parametrize('extras', [None])
 def bandit(session, extras):
-    """Check code with bandit"""
+    """Check code with bandit."""
     session.log(f'Run bandit for {lib_name}')
     standard_di_bandit(session, extras=extras, dilibraries=dilibraries)
 
 
 @nox.session(python=main_python, reuse_venv=True)
 def isort_check(session):
-    """Check code with isort"""
+    """Check code with isort."""
     session.log(f'Run isort_check for {lib_name}')
     standard_di_isort_check(session)
 
 
 @nox.session(python=main_python, reuse_venv=True)
 def isort(session):
-    """Sort imports with isort"""
+    """Sort imports with isort."""
     session.log(f'Run isort for {lib_name}')
     standard_di_isort(session)
 
@@ -77,15 +77,23 @@ def isort(session):
 @nox.session(python=main_python, reuse_venv=True)
 @nox.parametrize('extras', [None])
 def mypy(session, extras):
-    """Check code with mypy"""
+    """Check code with mypy."""
     session.log(f'Run mypy for {lib_name}')
     standard_di_mypy(session, extras=extras, dilibraries=dilibraries)
 
 
 @nox.session(python=main_python, reuse_venv=True)
 @nox.parametrize('extras', [None])
+def pytype(session, extras):
+    """Check code with pytype."""
+    session.log(f'Run pytype for {lib_name}')
+    standard_di_pytype(session, extras=extras, dilibraries=dilibraries)
+
+
+@nox.session(python=main_python, reuse_venv=True)
+@nox.parametrize('extras', [None])
 def check_outdated(session, extras):
-    """Check for outdated packages"""
+    """Check for outdated packages."""
     session.log(f'Run check_outdated for {lib_name}')
     standard_di_check_outdated(session, extras=extras, dilibraries=dilibraries)
 
@@ -106,7 +114,7 @@ def black_check(session):
 
 @nox.session(python=main_python, reuse_venv=True)
 def proselint(session):
-    """Check code with proselint"""
+    """Check code with proselint."""
     session.log(f'Run proselint for {lib_name}')
     standard_di_proselint(session)
 
@@ -114,11 +122,5 @@ def proselint(session):
 @nox.session(python=main_python, reuse_venv=True)
 def vale(session):
     """Check code with vale."""
-
     session.log(f'Run vale for {lib_name}')
     standard_di_vale(session)
-
-
-
-
-

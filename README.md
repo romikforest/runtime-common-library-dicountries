@@ -18,16 +18,16 @@ You can run the python and pip executables using `python` and `pip` commands, or
 your setup, you may have to run them like `python3` and `pip3` or using other aliases. The recommended
 way to install these scripts is to execute commands like:
 
-```shell script
-python -m install -U pip
-python -m install -U dicountries 
+```console
+% python -m pip install -U pip
+% python -m pip install -U dicountries 
 ```
 
 To access the azure artifact feed you need to set up your pip to use appropriate indices.
 For example you can set `PIP_EXTRA_INDEX_URL` environment variable like:
 
-```shell script
-export PIP_EXTRA_INDEX_URL="https://di_libraries:<access token>@pkgs.dev.azure.com/swodataintelligence/71b5c973-6f2c-42b7-a0a9-8af59f1bf7ee/_packaging/di_libraries_test/pypi/simple/"
+```console
+% export PIP_EXTRA_INDEX_URL="https://di_libraries:<access token>@pkgs.dev.azure.com/swodataintelligence/71b5c973-6f2c-42b7-a0a9-8af59f1bf7ee/_packaging/di_libraries_test/pypi/simple/"
 ```
 
 or you can add a file pip.ini (Windows) or pip.conf (Mac/Linux) to your virtualenv
@@ -51,7 +51,8 @@ from dicountries.whoosh_index import CountryIndex
 country_index = CountryIndex()
 country_index.refresh()
 
-print(country_index.normalize_country('Россия'))
+print(country_index.normalize_country('Russia'))
+print(country_index.normalize_country('Korea, Republic of'))
 print(country_index.refine_country('Korea, Republic of'))
 ```
 
@@ -122,7 +123,7 @@ country_index = CountryIndex(max_search_cache=1000)
 
 During the normalization the search process usually checks the cache first. If some
 country isn't found in the cache more complicated techniques will be used.
-Every found country is placed to the simple cache, but if the cache riches
+Every found country is placed to the simple cache, but if the cache reaches
 `max_search_cache` size it will be cleared and the search process will be reinitialized.
 
 

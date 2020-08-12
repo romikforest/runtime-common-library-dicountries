@@ -1,0 +1,14 @@
+# ninja log v5
+0	769	1597171041909268167	/Users/romik/Work/swo/Release3/dilibraries_dev/projects/runtime-common-library-dicountries/.pytype/pyi/tests/test_dicountries/__init__.pyi	18c1e2e9a5a17d0d
+769	1324	1597171042460190579	/Users/romik/Work/swo/Release3/dilibraries_dev/projects/runtime-common-library-dicountries/.pytype/pyi/tests/__init__.pyi	7ca03ed2201f1e21
+1324	17639	1597171057337896605	/Users/romik/Work/swo/Release3/dilibraries_dev/projects/runtime-common-library-dicountries/.pytype/pyi/dicountries/_country_mapping.pyi	f5a11f8e346938e7
+17639	18336	1597171059468174454	/Users/romik/Work/swo/Release3/dilibraries_dev/projects/runtime-common-library-dicountries/.pytype/pyi/dicountries/utils.pyi	413192fea2cb84c8
+18336	18917	1597171060052468945	/Users/romik/Work/swo/Release3/dilibraries_dev/projects/runtime-common-library-dicountries/.pytype/pyi/dicountries/whoosh_patches.pyi	2c40e49b74ccd2a1
+18917	19507	1597171060643607323	/Users/romik/Work/swo/Release3/dilibraries_dev/projects/runtime-common-library-dicountries/.pytype/pyi/dicountries/base_types.pyi	618919feae1e7ed8
+0	980	1597171384672193992	/Users/romik/Work/swo/Release3/dilibraries_dev/projects/runtime-common-library-dicountries/.pytype/pyi/dicountries/_post_process_country_mapping.pyi	5ac6a88cd265452b
+981	1533	1597171385226588093	/Users/romik/Work/swo/Release3/dilibraries_dev/projects/runtime-common-library-dicountries/.pytype/pyi/tests/test_dicountries/test_countries.pyi	fde8e5277d6b0c8
+1	1884	1597172209481691099	/Users/romik/Work/swo/Release3/dilibraries_dev/projects/runtime-common-library-dicountries/.pytype/pyi/dicountries/dict_index.pyi	1d31defa3743ad77
+1884	2790	1597172210537741915	/Users/romik/Work/swo/Release3/dilibraries_dev/projects/runtime-common-library-dicountries/.pytype/pyi/dicountries/metadata.pyi	4dab4e8f42672d5f
+2790	4417	1597172212072895117	/Users/romik/Work/swo/Release3/dilibraries_dev/projects/runtime-common-library-dicountries/.pytype/pyi/dicountries/loader.pyi	6085b17ecfe9b2be
+4417	7647	1597172215114716357	/Users/romik/Work/swo/Release3/dilibraries_dev/projects/runtime-common-library-dicountries/.pytype/pyi/dicountries/whoosh_index.pyi	b45a8b1f875c5314
+7647	8862	1597172216603626182	/Users/romik/Work/swo/Release3/dilibraries_dev/projects/runtime-common-library-dicountries/.pytype/pyi/dicountries/__init__.pyi	58d1242dff3db60c

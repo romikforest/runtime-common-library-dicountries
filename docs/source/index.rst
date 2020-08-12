@@ -2,29 +2,15 @@
   Welcome to DiCountries library documentation!
 =======================================================================
 
-.. sourcecode:: python
-
-    # DiCountries
-    import dicountries
-
------------------------------------
-
 .. toctree::
     :maxdepth: 3
     :caption: Intro
 
-    intro
+    README
 
 .. toctree::
-    :maxdepth: 3
-    :caption: Reference
+    :maxdepth: 20
+    :caption: References
 
-    reference/index
+    reference
 
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`

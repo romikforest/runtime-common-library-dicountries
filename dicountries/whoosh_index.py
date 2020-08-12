@@ -5,11 +5,12 @@ import logging
 import os
 import threading
 from datetime import datetime
+from typing import Any, List, Optional, Tuple, cast
 
 import pytz
+import whoosh
 from fuzzywuzzy import fuzz
 from unidecode import unidecode
-from whoosh import index
 from whoosh.analysis import StandardAnalyzer
 from whoosh.fields import STORED, TEXT, Schema
 from whoosh.filedb.filestore import FileStorage, RamStorage, copy_storage
@@ -17,8 +18,14 @@ from whoosh.index import EmptyIndexError, FileIndex
 from whoosh.qparser import QueryParser, syntax
 from whoosh.query import FuzzyTerm
 
+from .base_types import StringMap
 from .loader import create_basename_by_name_super_index, load_post_process_country_mapping
 from .utils import reorder_name
+
+from typing import MutableMapping
+# import typing
+# if typing.TYPE_CHECKING:
+#   import sketch
 
 logger = logging.getLogger('dicountries')
 logging.basicConfig(format='%(levelname)s  dicountries: %(message)s')
@@ -31,27 +38,27 @@ DEFAULT_MAX_SEARCH_CACHE = 1000  # Max size of the country cache.
 OrGroup = syntax.OrGroup.factory(0.9)
 
 
-def _clean_name(name):
+def _clean_name(name: str) -> str:
     """Preprocess names before indexing.
 
     Args:
-        name (str): name to preprocess
+        name: name to preprocess
 
     Returns:
-        str: preprocessed name
+        preprocessed name
 
     """
     return unidecode(name or '').strip().replace('(', ' ').replace(')', ' ')
 
 
-def _clean_name2(name):
+def _clean_name2(name: str) -> str:
     """Preprocess names before additional sorting.
 
     Args:
-        name (str): name to preprocess
+        name: name to preprocess
 
     Returns:
-        str: preprocessed name
+        preprocessed name
 
     """
     return unidecode(name or '').strip().replace('(', ' ').replace(')', ' ')
@@ -65,34 +72,93 @@ class CountryIndex:  # pylint: disable=too-many-instance-attributes
     Indexing can be done simultaneously with country name normalizing.
 
     Args:
-            index_path: path to save index. Default is f'indexes/countries_{COUNTRY_IX_VER}'.
+            index_path: path to save index. Default is ``f'indexes/countries_{COUNTRY_IX_VER}'``.
                 Is used to load index on startup which is saved every time it is rebuilt.
                 The inmemory copy of the index is used for normalizing and refining.
                 The on disk index allows to start normalize names immediately on
                 app startup. If index exists it will be rebuilt by
                 calling the `refresh` method explicitly
-            post_process_country_map: a map to postprocess normalized names (None or empty map
+            post_process_country_map: a mapping to postprocess normalized names (None or empty map
                 if no postprocessing required)
-            use_async (bool): use asyncio and threads to search and index simultaneously
+            use_async: use asyncio and threads to search and index simultaneously
             max_search_cache: max search cache size. If `max_search_cache` is reached the cache
                 will be cleared and reinitialized
 
-    Attributes:
-        post_process_country_map: mapping to postprocess country names or None
-        simple_index_lock (threading.Lock): lock object for the `simple_index` attribute
-        simple_index: mapping based on source country iso and synonym databases for direct search
-            (without fuzzy search)
-        ix_lock (threading.Lock): lock object for the `ix` attribute
-        ix: whoosh index
-        version: class version (determines backup format)
-        path: backup path, default: f'indexes/countries_{COUNTRY_IX_VER}'
-        last_update_lock (threading.Lock): lock object for the `last_update` attribute
-        last_update: last update time
-        update_lock (threading.Lock): lock object for the index refreshing
-        search_cache: mapping for the country searching cache (not saved to disk)
-        max_search_cache (int): max search cache size. If cache riches this size it will be
-            reinitialized.
     """
+
+    post_process_country_map: StringMap
+    """A mapping to postprocess country names or None."""
+
+    simple_index_lock: threading.Lock
+    """threading.Lock: Lock object for the `simple_index` attribute."""
+
+    simple_index: Optional[StringMap]
+    """mapping based on source country iso and synonym databases
+    for direct search (without fuzzy search).
+    """
+
+    ix_lock: threading.Lock
+    """threading.Lock: lock object for the `ix` attribute."""
+
+    ix: whoosh.index.Index
+    """whoosh index."""
+
+    version: int
+    """class version (determines backup format)."""
+
+    path: str
+    """str: backup path (default ``f'indexes/countries_{COUNTRY_IX_VER}'``)."""
+
+    last_update_lock: threading.Lock
+    """threading.Lock: lock object for the `last_update` attribute."""
+
+    last_update: Optional[datetime]
+    """last update time."""
+
+    update_lock: threading.Lock
+    """threading.Lock: lock object for the index refreshing."""
+
+    search_cache: StringMap
+    """mapping for the country searching cache (not saved to disk)."""
+
+    max_search_cache: int
+    """max search cache size. If cache reaches this size it will is reinitialized."""
+
+    def __init__(
+        self,
+        index_path: Optional[str] = None,
+        post_process_country_map: Optional[StringMap] = None,
+        use_async: bool = False,
+        max_search_cache: int = DEFAULT_MAX_SEARCH_CACHE,
+    ):
+        if post_process_country_map is None:
+            self.post_process_country_map = load_post_process_country_mapping()
+        else:
+            self.post_process_country_map = post_process_country_map
+        self.simple_index_lock = threading.Lock()
+        self.simple_index = None
+        self.ix_lock = threading.Lock()
+        self.ix = None
+        self.version = COUNTRY_IX_VER
+        if not index_path:
+            self.path = f'indexes/countries_{COUNTRY_IX_VER}'
+        else:
+            self.path = index_path
+        self.last_update_lock = threading.Lock()
+        self.last_update = None
+        self.update_lock = threading.Lock()
+        self.search_cache = {}
+        self.max_search_cache = max_search_cache
+
+        if use_async:
+            asyncio.get_event_loop().run_in_executor(None, self.restore_backuped_index)
+        else:
+            self.restore_backuped_index()
+        if not self.ix:
+            if use_async:
+                asyncio.get_event_loop().run_in_executor(None, self.refresh)
+            else:
+                self.refresh()
 
     schema = Schema(
         decoded_country=TEXT(
@@ -151,19 +217,20 @@ class CountryIndex:  # pylint: disable=too-many-instance-attributes
                 boost: boost factor
                 maxdist: the max levenshtein distance for the term
                 prefixlength: the unchangeable prefix length
-                constantscore (bool): use constant score
+                constantscore: use constant score
         """
 
         def __init__(  # pylint: disable=too-many-arguments
             self,
-            fieldname,
-            text,
-            boost=1.0,
-            maxdist=2,
-            prefixlength=0,
-            constantscore=False,
+            fieldname: str,
+            text: str,
+            boost: float = 1.0,
+            maxdist: int = 2,
+            prefixlength: int = 0,
+            constantscore: bool = False,
         ):
-            maxdist = 3
+            del maxdist
+            maxdist: int = 3
             if len(text) < 4:
                 maxdist = 0
             elif len(text) < 11:
@@ -173,43 +240,7 @@ class CountryIndex:  # pylint: disable=too-many-instance-attributes
 
             super().__init__(fieldname, text, boost, maxdist, prefixlength, constantscore)
 
-    def __init__(
-        self,
-        index_path=None,
-        post_process_country_map=None,
-        use_async=False,
-        max_search_cache=DEFAULT_MAX_SEARCH_CACHE,
-    ):
-        if post_process_country_map is None:
-            self.post_process_country_map = load_post_process_country_mapping()
-        else:
-            self.post_process_country_map = post_process_country_map
-        self.simple_index_lock = threading.Lock()
-        self.simple_index = None
-        self.ix_lock = threading.Lock()
-        self.ix = None
-        self.version = COUNTRY_IX_VER
-        if not index_path:
-            self.path = f'indexes/countries_{COUNTRY_IX_VER}'
-        else:
-            self.path = index_path
-        self.last_update_lock = threading.Lock()
-        self.last_update = None
-        self.update_lock = threading.Lock()
-        self.search_cache = {}
-        self.max_search_cache = max_search_cache
-
-        if use_async:
-            asyncio.get_event_loop().run_in_executor(None, self.restore_backuped_index)
-        else:
-            self.restore_backuped_index()
-        if not self.ix:
-            if use_async:
-                asyncio.get_event_loop().run_in_executor(None, self.refresh)
-            else:
-                self.refresh()
-
-    def post_process_name(self, name, postprocess=True):
+    def post_process_name(self, name: str, postprocess: bool = True) -> str:
         """Postprocess names after whoosh searching.
 
         Example:
@@ -218,11 +249,11 @@ class CountryIndex:  # pylint: disable=too-many-instance-attributes
             The postprocessing actually is done if the `postprocess` flag is True
 
         Args:
-            name (str): name to postprocess
+            name: name to postprocess
             postprocess: flag showing if postprocessing should be really applied
 
         Returns:
-            str: postprocessed or unchanged `name` value depending on the `postprocess` value
+            postprocessed or unchanged `name` value depending on the `postprocess` value
 
         """
         if not postprocess:
@@ -231,16 +262,16 @@ class CountryIndex:  # pylint: disable=too-many-instance-attributes
             return self.post_process_country_map[name]
         return name
 
-    def get_backup_path(self):
+    def get_backup_path(self) -> str:
         """Get backup path where index is saved on disk.
 
         Returns:
-            str: backup path
+            backup path
 
         """
         return self.path
 
-    def get_index(self):
+    def get_index(self) -> whoosh.index.Index:
         """Get whoosh index (thread safe).
 
         Returns:
@@ -250,7 +281,7 @@ class CountryIndex:  # pylint: disable=too-many-instance-attributes
         with self.ix_lock:
             return self.ix
 
-    def create_whoosh_ram_index(self):
+    def create_whoosh_ram_index(self) -> whoosh.index.Index:
         """Create inmemory whoosh index.
 
         Returns:
@@ -260,7 +291,7 @@ class CountryIndex:  # pylint: disable=too-many-instance-attributes
         storage = RamStorage()
         return FileIndex.create(storage, self.schema, 'MAIN')
 
-    def backup_index(self):
+    def backup_index(self) -> None:
         """Backup whoosh index in on disk file."""
         os.makedirs(self.path, exist_ok=True)
         with self.ix_lock:
@@ -268,18 +299,18 @@ class CountryIndex:  # pylint: disable=too-many-instance-attributes
                 with FileStorage(self.path) as file_storage:
                     copy_storage(self.ix.storage, file_storage)
 
-    async def restore_backuped_index_async(self):
+    async def restore_backuped_index_async(self) -> None:
         """Restore whoosh index from a file on disk to memory. Asynchronous version."""
         asyncio.get_event_loop().run_in_executor(None, self.restore_backuped_index)
 
-    def restore_backuped_index(self):
+    def restore_backuped_index(self) -> None:
         """Restore whoosh index from a file on disk to memory. Synchronous version."""
         with self.simple_index_lock:
             if not self.simple_index:
                 self.simple_index = create_basename_by_name_super_index()
         os.makedirs(self.path, exist_ok=True)
         try:
-            saved_ix = index.open_dir(self.path)
+            saved_ix = whoosh.index.open_dir(self.path)
         except EmptyIndexError:
             return
         cur_ix = self.create_whoosh_ram_index()
@@ -287,29 +318,29 @@ class CountryIndex:  # pylint: disable=too-many-instance-attributes
         with self.ix_lock:
             self.ix = cur_ix
 
-    def refresh(self, update_datetime=None):
+    def refresh(self, update_datetime: datetime = None) -> None:
         """Refresh whoosh country index. Synchronous version.
 
         Args:
-            update_datetime (datetime): last refresh time to control if a new refresh is required
+            update_datetime: last refresh time to control if a new refresh is required
 
         """
         self._refresh(update_datetime=update_datetime)
 
-    async def refresh_async(self, update_datetime=None):
+    async def refresh_async(self, update_datetime: datetime = None) -> None:
         """Refresh whoosh country index. Asynchronous version.
 
         Args:
-            update_datetime (datetime): last refresh time to control if a new refresh is required
+            update_datetime: last refresh time to control if a new refresh is required
 
         """
         asyncio.get_event_loop().run_in_executor(None, self._refresh, update_datetime)
 
-    def _refresh(self, update_datetime=None):
+    def _refresh(self, update_datetime: datetime = None):
         """Refresh whoosh index. Internal implementation.
 
         Args:
-            update_datetime (datetime): last refresh time to control if a new refresh is required
+            update_datetime: last refresh time to control if a new refresh is required
 
         """
         with self.update_lock:
@@ -348,17 +379,20 @@ class CountryIndex:  # pylint: disable=too-many-instance-attributes
             with self.last_update_lock:
                 self.last_update = datetime.utcnow().replace(tzinfo=pytz.timezone('utc'))
 
-    def normalize_country_detailed(self, name, limit=None):
+    def normalize_country_detailed(
+        self, name: str, limit: Optional[int] = None
+    ) -> Tuple[int, List[Any]]:
         """Detailed country normalization.
 
-        Returns whoosh index possible variants for the name and their rates.
-
         Args:
-            name (str): country name to normalize
+            name: country name to normalize
             limit: How many results should be searched (None to find all possible results)
 
         Raises:
             RuntimeError: if it is called during the reindexation process
+
+        Returns:
+            All possible variants from the whoosh index for the name and their rates.
 
         Note:
             The result scoring can be bad if the `limit` value differ from `None`
@@ -404,14 +438,14 @@ class CountryIndex:  # pylint: disable=too-many-instance-attributes
             results = sorted(results, key=lambda k: k['rate'], reverse=True)
             results_len = len(results)
             try:
-                limit = int(limit)
+                limit = int(cast(int, limit))
             except (ValueError, TypeError):
                 limit = None
             if limit:
                 results = results[:limit]
             return results_len, results
 
-    def normalize_country(self, name, postprocess=True):
+    def normalize_country(self, name: str, postprocess: bool = True) -> str:
         """Country name normalization.
 
         Only the variant with max rate will be returned.
@@ -420,11 +454,11 @@ class CountryIndex:  # pylint: disable=too-many-instance-attributes
         E.g. ISO name mapping to more desired by di team names
 
         Args:
-            name (str): name to normalize
+            name: name to normalize
             postprocess: flag showing if postprocessing should be applied
 
         Returns:
-            str: normalized and possibly postprocessed country name
+            normalized and possibly postprocessed country name
 
         """
         name = name.strip()
@@ -435,23 +469,24 @@ class CountryIndex:  # pylint: disable=too-many-instance-attributes
                 if name.capitalize() in self.simple_index:
                     return self.post_process_name(self.simple_index[name.capitalize()], postprocess)
         logger.info('! Use whoosh index for %s', name)
+        result: str
         if name in self.search_cache:
             result = self.search_cache[name]
         else:
-            result = self.normalize_country_detailed(name)
-            if not result[0]:
+            results = self.normalize_country_detailed(name)
+            if not results[0]:
                 logger.info('! missed %s', name)
                 result = self.post_process_name(name, postprocess)
             else:
-                result = result[1][0].get('basecountry')
+                result = results[1][0].get('basecountry')
                 result = self.post_process_name(result or name, postprocess)
             if len(self.search_cache) > self.max_search_cache:
                 self.search_cache = {}  # Reinit cache to protect memory (atacks?)
             self.search_cache[name] = result
         return result
 
-    def refine_country(self, name):
-        """Country name normalization.
+    def refine_country(self, name: str) -> str:
+        """Country name normalization and refining.
 
         Additional name refining will be done comparing with simple `normalize` version
         (using reorder_name function from the `country.utils` module).
@@ -465,7 +500,10 @@ class CountryIndex:  # pylint: disable=too-many-instance-attributes
             E.g. ISO name mapping to more desired by di team names.
 
         Args:
-            name (str): Name to normalize and refine
+            name: Country name to normalize and refine
+
+        Returns:
+            Normalized and possibly refined country name
 
         """
         name = self.normalize_country(name, postprocess=False)

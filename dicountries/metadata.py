@@ -5,7 +5,7 @@ import os
 
 version_file = os.path.join(os.path.dirname(__file__), 'version.py')
 if os.path.isfile(version_file):
-    from .version import __version__ as version  # pylint: disable=import-error
+    from .version import __version__ as version  # pylint: disable=import-error # type: ignore
 else:
     version = 'dev'
 

@@ -152,25 +152,25 @@ def create_index(  # noqa: C901
             else:
                 has_comma = ',' in second
                 if has_comma and policy == 'sort':
-                    index[second] = first
+                    index[cast(str, second)] = cast(str, first)
                     second = reorder_name(second)
                     if second in index:
                         logger.warning(REPORT_TEMPLATE_THERE_IS_FIELD, second, item)
                         doubles.add(second)
                     else:
-                        index[second] = first
+                        index[cast(str, second)] = cast(str, first)
 
                 elif has_comma and policy == 'split':
-                    index[second] = first
+                    index[cast(str, second)] = cast(str, first)
                     for entry in second.split(','):
                         if entry in index:
                             entry = entry.strip()
                             logger.warning(REPORT_TEMPLATE_THERE_IS_FIELD, entry, item)
                             doubles.add(entry)
                         else:
-                            index[entry] = first
+                            index[cast(str, entry)] = cast(str, first)
                 else:
-                    index[second] = first
+                    index[cast(str, second)] = cast(str, first)
 
     if not isinstance(second_fields, list):
         second_fields = cast(str, second_fields)
