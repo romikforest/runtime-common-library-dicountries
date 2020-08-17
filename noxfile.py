@@ -39,9 +39,18 @@ def build_library(session):
 @nox.session(python=main_python, reuse_venv=True)
 @nox.parametrize('extras', [None])
 def quality_task(session, extras, dilibraries=dilibraries):
-    """Run the standard quality pipeline."""
+    """Run the standard quality pipeline (format and check)."""
     session.log(f'Run quality_task in {lib_name}')
     standard_di_quality_task(session, extras=extras, dilibraries=dilibraries)
+
+
+@nox.session(python=main_python, reuse_venv=True)
+@nox.parametrize('extras', [None])
+def quality_check(session, extras, dilibraries=dilibraries):
+    """Run the standard quality pipeline (check only)."""
+    session.log(f'Run quality_check in {lib_name}')
+    standard_di_quality_check(session, extras=extras, dilibraries=dilibraries)
+
 
 
 @nox.session(python=main_python, reuse_venv=True)
