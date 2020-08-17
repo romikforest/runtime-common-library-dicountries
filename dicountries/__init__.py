@@ -1,7 +1,25 @@
 """DICOUNTRIES
 A library for country name refining and normalization.
 To prevent typo errors and using country name synonyms during data analysis.
-Normalization is based on ISO3166 database and country name synonyms from Wikipedia
+Normalization is based on `ISO3166 <https://en.wikipedia.org/wiki/ISO_3166>`_
+database and country name synonyms from Wikipedia
+
+Installation::
+
+    % python -m pip install -U pip
+    % python -m pip install -U dicountries
+
+Usage example::
+
+    from dicountries.whoosh_index import CountryIndex
+
+    country_index = CountryIndex()
+    country_index.refresh()
+
+    print(country_index.normalize_country('Russia'))
+    print(country_index.normalize_country('Korea, Republic of'))
+    print(country_index.refine_country('Korea, Republic of'))
+
 """
 
 # flake8: noqa: F401, F403

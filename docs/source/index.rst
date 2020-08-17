@@ -14,3 +14,10 @@
 
     reference
 
+.. .. toctree::
+    :maxdepth: 3
+    :caption: References
+    :glob:
+
+..    autoapi/*
+

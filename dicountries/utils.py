@@ -11,14 +11,14 @@ def get_main_code(code: str) -> str:
         a main country code
 
     Example:
-        If `code` has value "GT-SO" value "GT" will be returned
+        If ``code`` has value **GT-SO** value **GT** will be returned
 
     """
     return code.split('-')[0]
 
 
 def reorder_name(name: str) -> str:
-    """Reorder `name` splitting by comma.
+    """Reorder ``name`` splitting by comma.
 
     Args:
         name: name possible containing comma
@@ -27,7 +27,7 @@ def reorder_name(name: str) -> str:
         refined name
 
     Example:
-        If `name` is *"Korea, Republic of"* the return value will be *"Republic of Korea"*
+        If ``name`` is **Korea, Republic of** the return value will be **Republic of Korea**
 
     """
     if ',' not in name:

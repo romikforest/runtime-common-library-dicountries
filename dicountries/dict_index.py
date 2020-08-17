@@ -53,8 +53,8 @@ def get_keys(db: SimpleDB) -> Set[str]:
 def normalize_keys(db: ListDB, key_mapping: StringMap) -> ListDB:
     """Normalize database keys.
 
-    Create a new list database on base of `db` list database transforming keys
-    accordingly to the `key_mapping` mapping.
+    Create a new list database on base of ``db`` list database transforming keys
+    accordingly to the ``key_mapping`` mapping.
 
     Args:
         db: incoming list database
@@ -87,7 +87,7 @@ def create_dict_db(db: ListDB, field_name: str, allow_doubles: bool = False) -> 
         dict country database
 
     Raises:
-        RuntimeError: If key has already been added to the index and `allow_doubles` is False
+        RuntimeError: If key has already been added to the index and ``allow_doubles`` is False
 
     """
     new_db: DictDB = {}
@@ -116,7 +116,7 @@ def create_index(  # noqa: C901
         db: database
         first_field: field name whish value should be found by second_fields values
             if there are no first_field in some db records a warning
-            `Attention: non complete index` will be logged
+            ``Attention: non complete index`` will be logged
         second_fields: field name or list of filed names that database will be searched on
         policy: what to do if a comma sign found inside a value of some second_fields:
 
@@ -291,8 +291,8 @@ def reverse_index(index: Index) -> Index:
 def add_base_country(db: SimpleDB, source_field: str, dest_field: str) -> None:
     """Add base country field to database.
 
-    Add a field with base country part using `dest_field` description
-    for the list-like or dict like database `db` records.
+    Add a field with base country part using ``dest_field`` description
+    for the list-like or dict like database ``db`` records.
 
     Args:
         db: processed database
@@ -300,8 +300,8 @@ def add_base_country(db: SimpleDB, source_field: str, dest_field: str) -> None:
         dest_field: a field name to save the base country information.
 
     Example:
-        If some `source_field` has value "GT-SO" then
-        value "GT" will be saved as the value of the `dest_field`.
+        If some ``source_field`` has value **GT-SO** then
+        value **GT** will be saved as the value of the ``dest_field``.
 
     """
     no_source: bool = False

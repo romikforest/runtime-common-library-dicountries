@@ -38,6 +38,14 @@ def build_library(session):
 
 @nox.session(python=main_python, reuse_venv=True)
 @nox.parametrize('extras', [None])
+def quality_task(session, extras, dilibraries=dilibraries):
+    """Run the standard quality pipeline."""
+    session.log(f'Run quality_task in {lib_name}')
+    standard_di_quality_task(session, extras=extras, dilibraries=dilibraries)
+
+
+@nox.session(python=main_python, reuse_venv=True)
+@nox.parametrize('extras', [None])
 def flake8(session, extras):
     """Check code with flake8."""
     session.log(f'Run flake8 for {lib_name}')

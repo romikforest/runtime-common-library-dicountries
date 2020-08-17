@@ -27,7 +27,8 @@ def get_json_data(file_name: str) -> JSONType:
 
     Note:
         This functions supports any package location, including zipfiles and so on.
-        It uses `pkgutil` functions to load data from the `data` package subdirectory
+        It uses :py:mod:`pkgutil` functions to load data from the ``data``
+        subdirectory of the :py:mod:`dicountires` module
 
     """
     import pkgutil  # pylint: disable=import-outside-toplevel
@@ -38,28 +39,25 @@ def get_json_data(file_name: str) -> JSONType:
     return json.loads(data.decode('utf-8'))
 
 
+#: Mapping for main_country db field names
+#: {'common', 'name', 'a3', 'a2', 'num', 'official'}
 main_country_key_map: StringMap = dict(
     alpha_2='a2', alpha_3='a3', numeric='num', official_name='official', common_name='common',
 )
-"""Mapping for main_country db field names
-{'common', 'name', 'a3', 'a2', 'num', 'official'}
-"""
 
+#: Mapping for country_region db field names
+#: {'parent', 'code', 'name', 'type'}
 country_region_key_map: StringMap = dict()
-"""Mapping for country_region db field names
-{'parent', 'code', 'name', 'type'}
-"""
 
+#: Mapping for former countries db field names
+#: {'withdrawal_date', 'num', 'name', 'a2', 'comment', 'a4', 'a3'}
 country_old_key_map: StringMap = dict(
     alpha_2='a2', alpha_3='a3', alpha_4='a4', numeric='num',
 )
-"""Mapping for former countries db field names
-{'withdrawal_date', 'num', 'name', 'a2', 'comment', 'a4', 'a3'}
-"""
 
 
 def load_main_country_db() -> DictDB:
-    """Load main country database (ISO3166-1).
+    """Load main country database (`ISO3166-1 <https://en.wikipedia.org/wiki/ISO_3166-1>`_).
 
     Returns:
         main country dict database
@@ -71,7 +69,7 @@ def load_main_country_db() -> DictDB:
 
 
 def load_country_region_db() -> DictDB:
-    """Load country region database (ISO3166-2).
+    """Load country region database (`ISO3166-2 <https://en.wikipedia.org/wiki/ISO_3166-2>`_).
 
     Returns:
         main country region dict database
@@ -92,7 +90,7 @@ def load_country_region_db() -> DictDB:
 
 
 def load_country_old_db() -> DictDB:
-    """Load former country database (ISO3166-3).
+    """Load former country database (`ISO3166-3 <https://en.wikipedia.org/wiki/ISO_3166-3>`_).
 
     Returns:
         former country dict database

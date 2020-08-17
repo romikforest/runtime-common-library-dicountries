@@ -9,7 +9,16 @@
    :ignore-module-all:
    :exclude-members: '__init__'
 
-   .. rubric:: Module Contents
+   {% if classes %}
+   .. only:: not rinoh
+
+       Inheritance diagrams
+       ^^^^^^^^^^^^^^^^^^^^
+
+       .. inheritance-diagram:: {{ fullname }}
+
+   {% endif %}
+
 
    {% block modules %}
    {% if modules %}
@@ -24,6 +33,16 @@
    {%- endfor %}
    {% endif %}
    {% endblock %}
+
+   .. ifconfig:: "{{fullname | escape }}" == "{{module | escape}}"
+
+      Package Contents
+      ^^^^^^^^^^^^^^^^
+
+   .. ifconfig:: "{{fullname | escape }}" != "{{module | escape}}"
+
+      Module Contents
+      ^^^^^^^^^^^^^^^
 
    {% block attributes %}
    {% if attributes %}

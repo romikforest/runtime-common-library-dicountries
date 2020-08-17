@@ -37,6 +37,7 @@ def extras(*p):
 def extras_require():
     return {x: extras(x + '.txt') for x in BUNDLES}
 
+
 if __name__ == '__main__':
     setup(
         name=metadata.name,
@@ -50,7 +51,7 @@ if __name__ == '__main__':
         python_requires='>=3.6.0',
         install_requires=reqs('default.txt'),
         extras_require=extras_require(),
-        long_description=open('README.md').read(),
+        long_description=open('README.rst').read(),
         package_data={'dicountries': ['data/*']},
         zip_safe=False,
     )

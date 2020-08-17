@@ -22,11 +22,6 @@ from .base_types import StringMap
 from .loader import create_basename_by_name_super_index, load_post_process_country_mapping
 from .utils import reorder_name
 
-from typing import MutableMapping
-# import typing
-# if typing.TYPE_CHECKING:
-#   import sketch
-
 logger = logging.getLogger('dicountries')
 logging.basicConfig(format='%(levelname)s  dicountries: %(message)s')
 
@@ -72,57 +67,67 @@ class CountryIndex:  # pylint: disable=too-many-instance-attributes
     Indexing can be done simultaneously with country name normalizing.
 
     Args:
-            index_path: path to save index. Default is ``f'indexes/countries_{COUNTRY_IX_VER}'``.
+            index_path: path to save index. Default is **f'indexes/countries_{COUNTRY_IX_VER}'**.
                 Is used to load index on startup which is saved every time it is rebuilt.
                 The inmemory copy of the index is used for normalizing and refining.
                 The on disk index allows to start normalize names immediately on
                 app startup. If index exists it will be rebuilt by
-                calling the `refresh` method explicitly
+                calling the :py:meth:`refresh` method explicitly
             post_process_country_map: a mapping to postprocess normalized names (None or empty map
                 if no postprocessing required)
             use_async: use asyncio and threads to search and index simultaneously
-            max_search_cache: max search cache size. If `max_search_cache` is reached the cache
+            max_search_cache: max search cache size. If ``max_search_cache`` is reached the cache
                 will be cleared and reinitialized
 
+    Usage example::
+
+        from dicountries.whoosh_index import CountryIndex
+
+        country_index = CountryIndex()
+        country_index.refresh()
+
+        print(country_index.normalize_country('Russia'))
+        print(country_index.normalize_country('Korea, Republic of'))
+        print(country_index.refine_country('Korea, Republic of'))
+
     """
 
+    #: A mapping to postprocess country names or None.
     post_process_country_map: StringMap
-    """A mapping to postprocess country names or None."""
 
+    #: threading.Lock: Lock object for the :py:attr:`simple_index` attribute.
     simple_index_lock: threading.Lock
-    """threading.Lock: Lock object for the `simple_index` attribute."""
 
+    #: mapping based on source country iso and synonym databases
+    #: for direct search (without fuzzy search).
     simple_index: Optional[StringMap]
-    """mapping based on source country iso and synonym databases
-    for direct search (without fuzzy search).
-    """
 
+    #: threading.Lock: lock object for the :py:attr:`ix` attribute.
     ix_lock: threading.Lock
-    """threading.Lock: lock object for the `ix` attribute."""
 
+    #: whoosh index.
     ix: whoosh.index.Index
-    """whoosh index."""
 
+    #: class version (determines backup format).
     version: int
-    """class version (determines backup format)."""
 
+    #: str: backup path (default **f'indexes/countries_{COUNTRY_IX_VER}'**).
     path: str
-    """str: backup path (default ``f'indexes/countries_{COUNTRY_IX_VER}'``)."""
 
+    #: threading.Lock: lock object for the :py:attr:`last_update` attribute.
     last_update_lock: threading.Lock
-    """threading.Lock: lock object for the `last_update` attribute."""
 
+    #: last update time.
     last_update: Optional[datetime]
-    """last update time."""
 
+    #: threading.Lock: lock object for the index refreshing.
     update_lock: threading.Lock
-    """threading.Lock: lock object for the index refreshing."""
 
+    #: mapping for the country searching cache (not saved to disk).
     search_cache: StringMap
-    """mapping for the country searching cache (not saved to disk)."""
 
+    #: max search cache size. If cache reaches this size it will is reinitialized.
     max_search_cache: int
-    """max search cache size. If cache reaches this size it will is reinitialized."""
 
     def __init__(
         self,
@@ -160,11 +165,12 @@ class CountryIndex:  # pylint: disable=too-many-instance-attributes
             else:
                 self.refresh()
 
+    #: whoosh search schema
     schema = Schema(
         decoded_country=TEXT(
             phrase=False,
             analyzer=StandardAnalyzer(
-                stoplist=frozenset(
+                stoplist=frozenset(  # exclude us from standard stopwords
                     [
                         'and',
                         'is',
@@ -206,14 +212,13 @@ class CountryIndex:  # pylint: disable=too-many-instance-attributes
         country=STORED(),
         basecountry=STORED(),
     )
-    """whoosh search schema"""
 
     class CountryTermClass(FuzzyTerm):
         """Class controls number of typo mistakes as dependency on the term length.
 
         Args:
                 fieldname: a name of the field the score will be calculated for
-                text: the content of the `fieldname`
+                text: the content of the ``fieldname``
                 boost: boost factor
                 maxdist: the max levenshtein distance for the term
                 prefixlength: the unchangeable prefix length
@@ -246,14 +251,14 @@ class CountryIndex:  # pylint: disable=too-many-instance-attributes
         Example:
             Names, normalized accordingly ISO standard names can be transformed accordingly to
             some mapping to have more beautiful names for some countries as di team desires
-            The postprocessing actually is done if the `postprocess` flag is True
+            The postprocessing actually is done if the ``postprocess`` flag is **True**.
 
         Args:
             name: name to postprocess
             postprocess: flag showing if postprocessing should be really applied
 
         Returns:
-            postprocessed or unchanged `name` value depending on the `postprocess` value
+            postprocessed or unchanged ``name`` value depending on the ``postprocess`` value
 
         """
         if not postprocess:
@@ -395,7 +400,7 @@ class CountryIndex:  # pylint: disable=too-many-instance-attributes
             All possible variants from the whoosh index for the name and their rates.
 
         Note:
-            The result scoring can be bad if the `limit` value differ from `None`
+            The result scoring can be bad if the ``limit`` value differ from **None**
 
         """
         cur_ix = self.get_index()
@@ -450,7 +455,7 @@ class CountryIndex:  # pylint: disable=too-many-instance-attributes
 
         Only the variant with max rate will be returned.
 
-        If `postprocess` is True additional name postprocessing will be done.
+        If ``postprocess`` is True additional name postprocessing will be done.
         E.g. ISO name mapping to more desired by di team names
 
         Args:
@@ -488,15 +493,16 @@ class CountryIndex:  # pylint: disable=too-many-instance-attributes
     def refine_country(self, name: str) -> str:
         """Country name normalization and refining.
 
-        Additional name refining will be done comparing with simple `normalize` version
-        (using reorder_name function from the `country.utils` module).
+        Additional name refining will be done comparing with simple
+        :py:meth:`normalize_country` version
+        (using :py:func:`dicountries.utils.reorder_name`).
 
         Example:
-            If the normalized name is "Korea, Republic of" the return value
-            will be "Republic of Korea".
+            If the normalized name is **Korea, Republic of** the return value
+            will be **Republic of Korea**.
             Only the variant with max rate will be returned.
 
-            If `postprocess` is True additional name postprocessing will be done.
+            If ``postprocess`` is True additional name postprocessing will be done.
             E.g. ISO name mapping to more desired by di team names.
 
         Args:

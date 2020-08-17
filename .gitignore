@@ -1,6 +1,7 @@
 /dicountries/indexes/
-/indexes/
 corrector.py
+
+/indexes/
 /mypy_coverage/
 /code_coverage/
 /vale/
@@ -35,7 +36,10 @@ __pycache__/
 _build/
 
 # pytest
-.pytest_cache
+.pytest_cache/
+
+# pytype
+.pytype/
 
 # C extensions
 *.so
