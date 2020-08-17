@@ -52,7 +52,6 @@ def quality_check(session, extras, dilibraries=dilibraries):
     standard_di_quality_check(session, extras=extras, dilibraries=dilibraries)
 
 
-
 @nox.session(python=main_python, reuse_venv=True)
 @nox.parametrize('extras', [None])
 def flake8(session, extras):
