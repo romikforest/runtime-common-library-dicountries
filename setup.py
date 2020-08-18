@@ -43,7 +43,7 @@ if __name__ == '__main__':
         name=metadata.name,
         version=metadata.version,
         url=metadata.url,
-        license=metadata.lib_license,
+        license=metadata.license,
         author=metadata.author,
         author_email=metadata.author_email,
         description=metadata.description,

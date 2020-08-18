@@ -1,4 +1,5 @@
 """Package metadata aggregation."""
+
 import os
 
 # pylint: disable=invalid-name
@@ -10,9 +11,9 @@ else:
     version = 'dev'
 
 name = 'dicountries'
-lib_copyright = '2020, SoftwareONE'
+copyright = '2020, SoftwareONE'
 author = 'Koptev, Roman'
 description = 'Common library to normalize country names for DI project'
-lib_license = 'SWO'
+license = 'SWO'
 url = 'https://swodataintelligence@dev.azure.com/swodataintelligence/Data%20Intelligence%20Scrum/_git/runtime-common-library-dicountries'  # pylint: disable=line-too-long # noqa E501
 author_email = 'roman.koptev@softwareone.com'

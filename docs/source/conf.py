@@ -19,7 +19,9 @@ from configparser import ConfigParser
 
 from recommonmark.transform import AutoStructify
 
-sys.path.insert(0, os.path.abspath('../..'))
+sys.path.insert(0, os.path.abspath(os.path.join('..', '..')))
+has_src = os.path.isdir(os.path.join('..', '..', 'src'))
+
 sys.setrecursionlimit(1500)
 
 config = ConfigParser()
@@ -43,15 +45,21 @@ else:
 
 # -- Project information -----------------------------------------------------
 
-setup_module_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-setup_module_path = os.path.join(setup_module_path, 'setup.py')
-spec = importlib.util.spec_from_file_location('setup', setup_module_path)
-setup_module = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(setup_module)
-metadata = setup_module.metadata
+if has_src:
+    metadata_path = os.path.abspath(os.path.join('..', '..', 'src', 'metadata.py'))
+    spec = importlib.util.spec_from_file_location('metadata', metadata_path)
+    metadata = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(metadata)
+else:
+    setup_module_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    setup_module_path = os.path.join(setup_module_path, 'setup.py')
+    spec = importlib.util.spec_from_file_location('setup', setup_module_path)
+    setup_module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(setup_module)
+    metadata = setup_module.metadata
 
 project = metadata.name
-copyright = metadata.lib_copyright
+copyright = metadata.copyright
 author = metadata.author
 description = metadata.description
 

@@ -23,14 +23,15 @@ def docs(session, dilibraries=dilibraries):
 
 
 @nox.session(python=main_python)
-def install_dev(session):
+@nox.parametrize('extras', [None])
+def install_dev(session, extras, dilibraries=dilibraries):
     """Create development virtual environment."""
     session.log(f'Run install_dev in {lib_name}')
-    common_setup(session, dilibraries=dilibraries)
+    common_setup(session, extras=extras, dilibraries=dilibraries)
 
 
 @nox.session(python=main_python)
-def build_library(session):
+def build_library(session, dilibraries=dilibraries):
     """Build library package (Add version file manually)."""
     session.log(f'Run build_library in {lib_name}')
     standard_build_di_library(session, dilibraries=dilibraries)
@@ -54,7 +55,7 @@ def quality_check(session, extras, dilibraries=dilibraries):
 
 @nox.session(python=main_python, reuse_venv=True)
 @nox.parametrize('extras', [None])
-def flake8(session, extras):
+def flake8(session, extras, dilibraries=dilibraries):
     """Check code with flake8."""
     session.log(f'Run flake8 for {lib_name}')
     standard_di_flake8(session, extras=extras, dilibraries=dilibraries)
@@ -62,7 +63,7 @@ def flake8(session, extras):
 
 @nox.session(python=main_python, reuse_venv=True)
 @nox.parametrize('extras', [None])
-def pylint(session, extras):
+def pylint(session, extras, dilibraries=dilibraries):
     """Check code with pylint."""
     session.log(f'Run pylint for {lib_name}')
     standard_di_pylint(session, extras=extras, dilibraries=dilibraries)
@@ -70,29 +71,29 @@ def pylint(session, extras):
 
 @nox.session(python=main_python, reuse_venv=True)
 @nox.parametrize('extras', [None])
-def bandit(session, extras):
+def bandit(session, extras, dilibraries=dilibraries):
     """Check code with bandit."""
     session.log(f'Run bandit for {lib_name}')
     standard_di_bandit(session, extras=extras, dilibraries=dilibraries)
 
 
 @nox.session(python=main_python, reuse_venv=True)
-def isort_check(session):
+def isort_check(session, dilibraries=dilibraries):
     """Check code with isort."""
     session.log(f'Run isort_check for {lib_name}')
-    standard_di_isort_check(session)
+    standard_di_isort_check(session, dilibraries=dilibraries)
 
 
 @nox.session(python=main_python, reuse_venv=True)
-def isort(session):
+def isort(session, dilibraries=dilibraries):
     """Sort imports with isort."""
     session.log(f'Run isort for {lib_name}')
-    standard_di_isort(session)
+    standard_di_isort(session, dilibraries=dilibraries)
 
 
 @nox.session(python=main_python, reuse_venv=True)
 @nox.parametrize('extras', [None])
-def mypy(session, extras):
+def mypy(session, extras, dilibraries=dilibraries):
     """Check code with mypy."""
     session.log(f'Run mypy for {lib_name}')
     standard_di_mypy(session, extras=extras, dilibraries=dilibraries)
@@ -100,7 +101,7 @@ def mypy(session, extras):
 
 @nox.session(python=main_python, reuse_venv=True)
 @nox.parametrize('extras', [None])
-def pytype(session, extras):
+def pytype(session, extras, dilibraries=dilibraries):
     """Check code with pytype."""
     session.log(f'Run pytype for {lib_name}')
     standard_di_pytype(session, extras=extras, dilibraries=dilibraries)
@@ -108,35 +109,35 @@ def pytype(session, extras):
 
 @nox.session(python=main_python, reuse_venv=True)
 @nox.parametrize('extras', [None])
-def check_outdated(session, extras):
+def check_outdated(session, extras, dilibraries=dilibraries):
     """Check for outdated packages."""
     session.log(f'Run check_outdated for {lib_name}')
     standard_di_check_outdated(session, extras=extras, dilibraries=dilibraries)
 
 
 @nox.session(python=main_python, reuse_venv=True)
-def black(session):
+def black(session, dilibraries=dilibraries):
     """Format code with black (brunette)."""
-    session.log(f'Run isort for {lib_name}')
-    standard_di_black(session)
+    session.log(f'Run black for {lib_name}')
+    standard_di_black(session, dilibraries=dilibraries)
 
 
 @nox.session(python=main_python, reuse_venv=True)
-def black_check(session):
+def black_check(session, dilibraries=dilibraries):
     """Print code diffs for black (brunette) formatting."""
-    session.log(f'Run isort for {lib_name}')
-    standard_di_black_check(session)
+    session.log(f'Run black_check for {lib_name}')
+    standard_di_black_check(session, dilibraries=dilibraries)
 
 
 @nox.session(python=main_python, reuse_venv=True)
-def proselint(session):
+def proselint(session, dilibraries=dilibraries):
     """Check code with proselint."""
     session.log(f'Run proselint for {lib_name}')
-    standard_di_proselint(session)
+    standard_di_proselint(session, dilibraries=dilibraries)
 
 
 @nox.session(python=main_python, reuse_venv=True)
-def vale(session):
+def vale(session, dilibraries=dilibraries):
     """Check code with vale."""
     session.log(f'Run vale for {lib_name}')
-    standard_di_vale(session)
+    standard_di_vale(session, dilibraries=dilibraries)

@@ -24,19 +24,28 @@ Usage example::
 
 # flake8: noqa: F401, F403
 
-from .metadata import version as __version__
+from dicountries.metadata import version as __version__
 
 
 def _need_import():
+    import inspect  # pylint: disable=import-outside-toplevel
+
     import __main__  # pylint: disable=import-outside-toplevel
 
+    stack = inspect.stack(0)
+    try:
+        for entry in stack:
+            if hasattr(entry, 'function') and entry.function == 'load_metadata':
+                return False
+    finally:
+        del stack
     return __main__.__file__ != 'setup.py'
 
 
 if _need_import():
-    from .whoosh_patches import *  # isort:skip
-    from .base_types import *
-    from .dict_index import *
-    from .loader import *
-    from .utils import *
-    from .whoosh_index import *
+    from dicountries.whoosh_patches import *  # isort:skip
+    from dicountries.base_types import *
+    from dicountries.dict_index import *
+    from dicountries.loader import *
+    from dicountries.utils import *
+    from dicountries.whoosh_index import *
