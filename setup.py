@@ -37,8 +37,10 @@ def extras(*p):
 
 
 def extras_require():
-    return {**{x: extras(f'{x}.txt') for x in BUNDLES},
-            **{x: extras(f'pre-{x}.txt') for x in BUNDLES}}
+    return {
+        **{x: extras(f'{x}.txt') for x in BUNDLES},
+        **{x: extras(f'pre-{x}.txt') for x in BUNDLES},
+    }
 
 
 if __name__ == '__main__':
