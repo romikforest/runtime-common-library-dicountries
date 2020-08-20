@@ -134,10 +134,6 @@ country isn't found in the cache more complicated techniques will be used.
 Every found country is placed to the simple cache, but if the cache reaches
 ``max_search_cache`` size it will be cleared and the search process will be reinitialized.
 
-.. only:: html
-
-    Links
-    =====
 
 .. target-notes::
 
