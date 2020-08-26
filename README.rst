@@ -1,3 +1,7 @@
+.. note::
+
+    This repository on github is just a task for job candidates. It's not for production and it's not exactly the version we use.
+
 .. raw:: html
 
    <font size="+2"><h1>DiCountries introduction</h1></font>
